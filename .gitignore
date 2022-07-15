@@ -1,0 +1,6 @@
+# Project exclude paths
+/.gradle/
+/authentic-api/build/
+/authentic-api/build/classes/java/main/
+/authentic-plugin/build/
+/authentic-plugin/build/classes/java/main/

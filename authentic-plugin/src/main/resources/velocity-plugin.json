@@ -1,0 +1,15 @@
+{
+  "id": "${id}",
+  "name": "${name}",
+  "version": "${version}",
+  "description": "${description}",
+  "url": "https://github.com/iwmc-git/Authentic",
+  "authors": ["nightlyDuck", "sBwAeBeYt"],
+  "dependencies":[
+    {
+      "id": "noelle",
+      "optional": false
+    }
+  ],
+  "main": "pw.iwmc.authentic.VelocityAuthentic"
+}

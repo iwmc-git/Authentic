@@ -1,0 +1,74 @@
+#  |
+#  |  Authentic - Authorization plugin for Velocity.
+#  |  Version - v0.0.1-SNAPSHOT, made by nightlyDuck and sBwAeBeYt.
+#  |
+#  |  Project on GitHub - https://github.com/iwmc-git/Authentic
+#  |  Powered by noELLE.
+#  |
+
+### Main plugin settings.
+
+## Login methods, the following is available:
+#
+# MIXED     ->      Mixing modes `MOJANG` and `UNIQUE`.
+#
+# MOJANG    ->      Players with nicknames of licensed players
+#                   will not be able to go to the server.
+#
+# CRACKED   ->      Similarly, if `online-oode: false` is
+#                   installed, but the license login will
+#                   not be available.
+#
+# UNIQUE    ->      Unique UUID generation, instead of the
+#                   standard generation of Velocity.
+login-mode: MIXED
+
+## License server modes, the following is available:
+#
+# MOJANG                 ->     Request license UUID only from Mojang.
+#
+# MINETOOLS              ->     Request license UUID only from MineTools.
+#
+# MOJANG_AFTER_MINETOOLS ->     If MineTools license handler is down,
+#                               license UUID will be received from Mojang.
+#
+# MINETOOLS_AFTER_MOJANG ->     If Mojang license handler is down,
+#                               license UUID will be received from MineTools.
+license-server-mode: MINETOOLS
+
+## Default session time.
+# The time through which the period of time in minutes,
+# the player will again need to login.
+session-time: 10080
+
+default-language: en_us
+
+storage:
+  type: H2
+
+  host: localhost:3306
+  user: username
+  password: password
+  database: database
+
+  options: []
+auth-servers:
+  enable-virtual-server: true
+
+  login-servers:
+    - "login-1"
+    - "login-2"
+
+  lobby-servers:
+    - "lobby-1"
+    - "lobby-2"
+
+security:
+  encryption-method: SHA512
+
+  minimal-password-lenght: 6
+  maximal-password-lenght: 32
+
+  totp:
+    enabled: false
+    mandatory: false
