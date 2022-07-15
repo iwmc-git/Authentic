@@ -9,7 +9,7 @@ allprojects {
 
     group = "pw.iwmc.authentic"
     version = "0.0.1-SNAPSHOT"
-    description = "Fast and multifunctional authorization plugin, fork of LibrePremium."
+    description = "Fast and multifunctional authorization plugin."
 
     tasks {
         withType(JavaCompile::class.java) {
