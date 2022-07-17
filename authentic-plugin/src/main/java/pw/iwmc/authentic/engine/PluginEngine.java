@@ -21,15 +21,12 @@ import java.util.UUID;
 
 public class PluginEngine implements AuthenticEngine {
     private final VelocityAuthentic authentic = VelocityAuthentic.authentic();
-    private final PluginConfiguration configuration;
+    private final PluginConfiguration configuration = authentic.configuration();
 
     private final Cache<UUID, AuthenticAccount> cachedAccounts;
 
     public PluginEngine() {
-        this.authentic.logger().info("Loading engine...");
-        this.configuration = this.authentic.configuration();
-
-        this.authentic.logger().info("Loading cache...");
+        this.authentic.debug("Loading engine...");
         this.cachedAccounts = Caffeine.newBuilder()
                 .scheduler(Scheduler.systemScheduler())
                 .build();
@@ -148,7 +145,7 @@ public class PluginEngine implements AuthenticEngine {
         var accounts = cachedAccounts.asMap().entrySet();
 
         if (accounts.isEmpty()) {
-            authentic.logger().info("No account from cache was found!...");
+            authentic.debug("No account from cache was found!...");
             return;
         }
 
@@ -157,12 +154,14 @@ public class PluginEngine implements AuthenticEngine {
             var accountFromStorage = storage.fromStorage(account.playerName());
 
             if (accountFromStorage != null) {
+                authentic.debug(account.playerName() + "`s account exists in database! Updating...");
                 storage.updateAccount(account);
             } else {
+                authentic.debug(account.playerName() + "`s account does not exists in database! Creating new...");
                 storage.makeAccount(account);
             }
         });
 
-        authentic.logger().info("Uploaded " + accounts.size() + " accounts from cache!");
+        authentic.debug("Uploaded " + accounts.size() + " accounts from cache!");
     }
 }

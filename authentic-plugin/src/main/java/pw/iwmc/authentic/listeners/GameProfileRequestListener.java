@@ -22,16 +22,16 @@ public class GameProfileRequestListener {
 
     @Subscribe(order = PostOrder.FIRST, async = false)
     public void onGameProfileRequest(@NotNull GameProfileRequestEvent event) {
-        authentic.logger().info("Executing `onGameProfileRequest` for " + event.getUsername());
+        authentic.debug("Executing `onGameProfileRequest` for " + event.getUsername());
 
         var id = event.getGameProfile().getId();
         var name = event.getGameProfile().getName();
 
-        authentic.logger().info("Original UUID - " + id.toString());
+        authentic.debug("Original UUID - " + id.toString());
 
         var accountOptional = engine.byName(name);
         if (accountOptional.isEmpty()) {
-            authentic.logger().info("Account not found in cache! Creating new account...");
+            authentic.debug("Account not found in cache! Creating new account...");
 
             var loginMode = configuration.loginMode();
             var prepareId = loginMode == LoginMode.UNIQUE || loginMode == LoginMode.MIXED ? UUID.randomUUID() : id;
@@ -45,7 +45,7 @@ public class GameProfileRequestListener {
             var gameProfile = event.getOriginalProfile();
             event.setGameProfile(gameProfile.withId(entry.getValue().playerUniqueId()));
 
-            authentic.logger().info("Unique UUID - " + entry.getValue().playerUniqueId().toString());
+            authentic.debug("Unique UUID - " + entry.getValue().playerUniqueId().toString());
         });
     }
 }

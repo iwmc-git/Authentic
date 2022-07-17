@@ -11,6 +11,7 @@ public interface AuthenticConfiguration {
     String defaultLanguage();
 
     long sessionTime();
+    boolean debug();
 
     ServersNode authServers();
     StorageNode storage();

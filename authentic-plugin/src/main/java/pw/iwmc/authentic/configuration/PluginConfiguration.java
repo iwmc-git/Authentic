@@ -23,6 +23,9 @@ public class PluginConfiguration implements AuthenticConfiguration {
     @Setting("session-time")
     protected long sessionTime = 10080;
 
+    @Setting("debug")
+    protected boolean debug = true;
+
     @Setting("default-language")
     protected String defaultLanguage = "en_us";
 
@@ -60,6 +63,11 @@ public class PluginConfiguration implements AuthenticConfiguration {
     @Override
     public long sessionTime() {
         return sessionTime;
+    }
+
+    @Override
+    public boolean debug() {
+        return debug;
     }
 
     @Override

@@ -71,7 +71,28 @@ public class VelocityAuthentic implements Authentic {
 
         this.prepare();
         this.loadConfiguration();
-        this.validateDatabase();
+
+        var storageNode = configuration.storage();
+        var type = storageNode.storageType();
+        if (type == StorageType.MARIADB) {
+            var username = storageNode.user();
+            if (username.equalsIgnoreCase("username")) {
+                logger.error("Database section contains default value! (username: username)");
+                return;
+            }
+
+            var password = storageNode.password();
+            if (password.equalsIgnoreCase("password")) {
+                logger.error("Database section contains default value! (password: password)");
+                return;
+            }
+
+            var database = storageNode.database();
+            if (database.equalsIgnoreCase("database")) {
+                logger.error("Database section contains default value! (database: database)");
+                return;
+            }
+        }
 
         var defaultLanguageRaw = configuration.defaultLanguage();
         var optionalLanguage = Language.fromKey(LanguageKey.of(defaultLanguageRaw));
@@ -121,33 +142,8 @@ public class VelocityAuthentic implements Authentic {
         storage.close();
     }
 
-    private void validateDatabase() {
-        var storage = configuration.storage();
-        var type = storage.storageType();
-
-        if (type == StorageType.MARIADB) {
-            var username = storage.user();
-            if (username.equalsIgnoreCase("username")) {
-                logger.error("Database section contains default value! (username: username)");
-                return;
-            }
-
-            var password = storage.password();
-            if (password.equalsIgnoreCase("password")) {
-                logger.error("Database section contains default value! (password: password)");
-                return;
-            }
-
-            var database = storage.database();
-            if (database.equalsIgnoreCase("database")) {
-                logger.error("Database section contains default value! (database: database)");
-                return;
-            }
-        }
-    }
-
     private void prepare() {
-        this.logger.info("Downloading plugin dependencies...");
+        debug("Downloading plugin dependencies...");
 
         var caffeineDependency = Dependency.of("com.github.ben-manes.caffeine:caffeine:3.1.1");
         var libman = LibmanAPI.libman();
@@ -157,7 +153,7 @@ public class VelocityAuthentic implements Authentic {
 
         downloader.downloadDependency(caffeineDependency);
 
-        this.logger.info("Injecting dependencies...");
+        debug("Injecting dependencies...");
         downloaded.forEach((key, value) -> inject(value));
     }
 
@@ -166,7 +162,7 @@ public class VelocityAuthentic implements Authentic {
     }
 
     private void loadConfiguration() {
-        this.logger.info("Loading configuration...");
+        debug("Loading configuration...");
 
         try {
             if (Files.notExists(rootPath)) {
@@ -183,7 +179,7 @@ public class VelocityAuthentic implements Authentic {
                 Files.copy(resource, configFile);
             }
 
-            this.logger.info("Mapping configuration via object mapper...");
+            debug("Mapping configuration via object mapper...");
             this.configuration = YamlLoader.loader(configFile).configuration().value(PluginConfiguration.class);
         } catch (Exception exception) {
             throw new RuntimeException(exception);
@@ -192,6 +188,14 @@ public class VelocityAuthentic implements Authentic {
 
     public static VelocityAuthentic authentic() {
         return authentic;
+    }
+
+    public void debug(String message) {
+        var debug = configuration.debug();
+
+        if (debug) {
+            logger.warn(message);
+        }
     }
 
     public Logger logger() {

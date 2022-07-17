@@ -45,7 +45,7 @@ public class PluginStorage implements AuthenticStorage {
             }
         };
 
-        authentic.logger().info("Registered " + sqlFileReader.allQueries().size() + " database queries!");
+        authentic.debug("Registered " + sqlFileReader.allQueries().size() + " database queries!");
 
         sqlFileReader.query("makeTable").ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).execute());
 
@@ -81,7 +81,7 @@ public class PluginStorage implements AuthenticStorage {
             }
         }).execute());
 
-        authentic.logger().info("Added " + engine.cachedAccounts().size() + " account into cache!");
+        authentic.debug("Added " + engine.cachedAccounts().size() + " account into cache!");
     }
 
     private InputStream included(String name) {
