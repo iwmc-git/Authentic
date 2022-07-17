@@ -41,6 +41,16 @@ license-server-mode: MINETOOLS
 # the player will again need to login.
 session-time: 10080
 
+## Enables debug.
+# Enables debug mode to find a suspected bug
+debug: true
+
+## Account caching.
+# Account caching occurs according to the following scheme:
+# The cache itself is the main temporary storage, all the contents of the
+# cache are sent to the database after a certain period of time.
+# After restarting the plugin, the values from the database are written to
+# the cache, and so on cyclically.
 caching:
   time: 10
   unit: HOURS
