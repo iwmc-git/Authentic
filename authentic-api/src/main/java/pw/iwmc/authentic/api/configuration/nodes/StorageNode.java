@@ -11,6 +11,4 @@ public interface StorageNode {
     String user();
     String password();
     String database();
-
-    List<String> options();
 }

@@ -27,9 +27,6 @@ public class PluginStorageNode implements StorageNode {
     @Setting("database")
     protected String database = "database";
 
-    @Setting("options")
-    protected List<String> options = new ArrayList<>();
-
     @Override
     public StorageType storageType() {
         return storageType;
@@ -53,10 +50,5 @@ public class PluginStorageNode implements StorageNode {
     @Override
     public String database() {
         return database;
-    }
-
-    @Override
-    public List<String> options() {
-        return options;
     }
 }

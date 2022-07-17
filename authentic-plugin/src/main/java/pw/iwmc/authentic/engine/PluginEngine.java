@@ -143,23 +143,23 @@ public class PluginEngine implements AuthenticEngine {
 
     public void uploadCache() {
         authentic.logger().info("Uploading cache data into database...");
-        var accounts = new ArrayList<>(cachedAccounts.asMap().entrySet());
+
+        var storage = storage();
+        var accounts = cachedAccounts.asMap().entrySet();
 
         if (accounts.isEmpty()) {
             authentic.logger().info("No account from cache was found!...");
             return;
         }
 
-        var storage = storage();
         accounts.forEach(entry -> {
             var account = entry.getValue();
+            var accountFromStorage = storage.fromStorage(account.playerName());
 
-            if (storage.fromStorage(account.playerName()) != null) {
-                authentic.logger().info("Account " + account.playerName() + " exists in database! Rewriting...");
+            if (accountFromStorage != null) {
                 storage.updateAccount(account);
             } else {
-                authentic.logger().info("Account " + account.playerName() + " not exists! Creating new account...");
-                authentic.storage().makeAccount(account);
+                storage.makeAccount(account);
             }
         });
 

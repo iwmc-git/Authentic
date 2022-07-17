@@ -13,12 +13,12 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
 
 import noelle.configuration.yaml.YamlLoader;
-
 import noelle.features.languages.common.AbstractLanguages;
 import noelle.features.languages.common.backend.BackendType;
 import noelle.features.languages.common.key.LanguageKey;
 import noelle.features.languages.common.language.Language;
 import noelle.features.languages.velocity.VelocityLanguages;
+
 import org.slf4j.Logger;
 
 import pw.iwmc.authentic.api.Authentic;
@@ -43,6 +43,7 @@ public class VelocityAuthentic implements Authentic {
     private final Path rootPath;
 
     private ScheduledTask uploadCacheTask;
+    private ScheduledTask reconnectTask;
 
     private PluginConfiguration configuration;
     private PluginEngine engine;
@@ -95,8 +96,14 @@ public class VelocityAuthentic implements Authentic {
 
         this.uploadCacheTask = proxyServer.getScheduler()
                 .buildTask(authentic, () -> engine.uploadCache())
-                .delay(1, TimeUnit.MINUTES)
-                .repeat(1, TimeUnit.MINUTES)
+                .delay(configuration.caching().cachingTime())
+                .repeat(configuration.caching().cachingTime())
+                .schedule();
+
+        this.reconnectTask = proxyServer.getScheduler()
+                .buildTask(this, () -> storage.reconnect())
+                .delay(10, TimeUnit.MINUTES)
+                .repeat(10, TimeUnit.MINUTES)
                 .schedule();
 
         var eventManager = proxyServer.getEventManager();
@@ -108,8 +115,10 @@ public class VelocityAuthentic implements Authentic {
         var formattedMessage = String.format("%s v%s is stopping now...", this.description.getName().get(), this.description.getVersion().get());
         this.logger.info(formattedMessage);
 
-        storage.close(false);
+        reconnectTask.cancel();
         uploadCacheTask.cancel();
+
+        storage.close();
     }
 
     private void validateDatabase() {

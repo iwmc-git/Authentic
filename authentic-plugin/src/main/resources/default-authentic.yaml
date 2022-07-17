@@ -41,6 +41,10 @@ license-server-mode: MINETOOLS
 # the player will again need to login.
 session-time: 10080
 
+caching:
+  time: 10
+  unit: HOURS
+
 default-language: en_us
 
 storage:
@@ -51,10 +55,7 @@ storage:
   password: password
   database: database
 
-  options: []
-auth-servers:
-  enable-virtual-server: true
-
+servers:
   login-servers:
     - "login-1"
     - "login-2"

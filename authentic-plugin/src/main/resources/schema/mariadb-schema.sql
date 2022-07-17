@@ -41,6 +41,9 @@ INSERT INTO `authentic_data` (
     sessionEndDate
 ) VALUES (?, ?, ?, ?, ?, ?);
 
+-- #reconnect
+SELECT 1;
+
 -- #dropAccount
 -- Removes account from database.
 DELETE FROM `authentic_data` WHERE `playerUniqueId` = ?;

@@ -2,9 +2,9 @@ package pw.iwmc.authentic.engine.storage;
 
 import noelle.database.DefaultConnection;
 import noelle.database.credentials.Credentials;
-import noelle.database.h2.H2DatabaseConnection;
-import noelle.database.mariadb.MariaDBDatabaseConnection;
 import noelle.database.reader.SQLFileReader;
+import noelle.database.h2.H2Connection;
+import noelle.database.mariadb.MariaDBConnection;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +16,7 @@ import pw.iwmc.authentic.api.engine.storage.StorageType;
 
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 public class PluginStorage implements AuthenticStorage {
@@ -33,25 +34,28 @@ public class PluginStorage implements AuthenticStorage {
                 var includedStream = included("h2-schema.sql");
                 this.sqlFileReader = SQLFileReader.readStream(includedStream);
 
-                yield H2DatabaseConnection.newConnection(credentials, authentic.rootPath());
+                yield H2Connection.makeConnection(credentials, authentic.rootPath());
             }
 
             case MARIADB -> {
                 var includedStream = included("mariadb-schema.sql");
                 this.sqlFileReader = SQLFileReader.readStream(includedStream);
 
-                yield MariaDBDatabaseConnection.newConnection(credentials);
+                yield MariaDBConnection.makeConnection(credentials);
             }
         };
 
         authentic.logger().info("Registered " + sqlFileReader.allQueries().size() + " database queries!");
 
-        sqlFileReader.query("makeTable").ifPresent(sqlQuery -> connection.execute(sqlQuery.query()));
+        sqlFileReader.query("makeTable").ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).execute());
 
         var engine = authentic.engine();
         var query = sqlFileReader.query("mapIntoCache");
-        query.ifPresent(sqlQuery -> connection.query(sqlQuery.query(), resultSet -> {
+
+        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
             try {
+                var resultSet = preparedStatement.executeQuery();
+
                 while (resultSet.next()) {
                     var uniqueId = UUID.fromString(resultSet.getString(1));
                     var name = resultSet.getString(2);
@@ -75,9 +79,7 @@ public class PluginStorage implements AuthenticStorage {
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
             }
-
-            return null;
-        }));
+        }).execute());
 
         authentic.logger().info("Added " + engine.cachedAccounts().size() + " account into cache!");
     }
@@ -88,45 +90,40 @@ public class PluginStorage implements AuthenticStorage {
 
     @Override
     public @Nullable AuthenticAccount fromStorage(String name) {
-        var query = sqlFileReader.query("accountByName");
+        var query = sqlFileReader.query("accountByName").get().query();
 
-        query.ifPresent(sqlQuery -> connection.query(String.format(sqlQuery.query(), name), resultSet -> {
+        return connection.query(String.format(query, name)).first(resultSet -> {
+            var uniqueId = UUID.fromString(resultSet.getString(1));
+            var playerName = resultSet.getString(2);
+
+            var account = new AuthenticPlayerAccount(uniqueId, playerName);
+
+            var hashedPassword = resultSet.getString(3);
+            account.updateHashedPassword(hashedPassword);
+
+            var licenseId = resultSet.getString(4);
+            account.updateLicenseId(licenseId != null ? UUID.fromString(licenseId) : null);
+
+            var lastLoggedAddress = resultSet.getString(5);
+
             try {
-                if (resultSet.next()) {
-                    var uniqueId = UUID.fromString(resultSet.getString(1));
-                    var playerName = resultSet.getString(2);
-
-                    var account = new AuthenticPlayerAccount(uniqueId, playerName);
-
-                    var hashedPassword = resultSet.getString(3);
-                    account.updateHashedPassword(hashedPassword);
-
-                    var licenseId = resultSet.getString(4);
-                    account.updateLicenseId(licenseId != null ? UUID.fromString(licenseId) : null);
-
-                    var lastLoggedAddress = resultSet.getString(5);
-                    account.updateLastLoggedAddress(lastLoggedAddress != null ? InetAddress.getByName(lastLoggedAddress) : null);
-
-                    var sessionEndTime = resultSet.getTimestamp(6);
-                    account.updateSessionEndDate(sessionEndTime);
-
-                    return account;
-                }
-
-                return null;
-            } catch (Exception exception) {
-                throw new RuntimeException(exception);
+                account.updateLastLoggedAddress(lastLoggedAddress != null ? InetAddress.getByName(lastLoggedAddress) : null);
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e);
             }
-        }));
 
-        return null;
+            var sessionEndTime = resultSet.getTimestamp(6);
+            account.updateSessionEndDate(sessionEndTime);
+
+            return account;
+        }).orElse(null);
     }
 
     @Override
     public @Nullable AuthenticAccount fromStorage(UUID playerUniqueId) {
-        var query = sqlFileReader.query("accountByUniqueId");
+        var query = sqlFileReader.query("accountByUniqueId").get().query();
 
-        query.ifPresent(sqlQuery -> connection.query(String.format(sqlQuery.query(), playerUniqueId.toString()), resultSet -> {
+        return connection.query(String.format(query, playerUniqueId.toString())).first(resultSet -> {
             try {
                 var uniqueId = UUID.fromString(resultSet.getString(1));
                 var playerName = resultSet.getString(2);
@@ -149,9 +146,7 @@ public class PluginStorage implements AuthenticStorage {
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
             }
-        }));
-
-        return null;
+        }).orElse(null);
     }
 
     @Override
@@ -163,13 +158,12 @@ public class PluginStorage implements AuthenticStorage {
     public void dropAccount(AuthenticAccount account) {
         var query = sqlFileReader.query("dropAccount");
 
-        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query(), preparedStatement -> {
-            try {
-                preparedStatement.setString(1, account.playerUniqueId().toString());
-            } catch (Exception exception) {
-                throw new RuntimeException(exception);
-            }
-        }));
+        query.ifPresent(sqlQuery ->
+                connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
+                    preparedStatement.setString(1, account.playerUniqueId().toString());
+
+                    preparedStatement.closeOnCompletion();
+                }).execute());
     }
 
     @Override
@@ -181,103 +175,92 @@ public class PluginStorage implements AuthenticStorage {
     public void updateAccount(AuthenticAccount account) {
         var query = sqlFileReader.query("updateAccount");
 
-        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query(), preparedStatement -> {
+        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
+            preparedStatement.setString(1, account.playerUniqueId().toString());
+            preparedStatement.setString(2, account.playerName());
+
             try {
-                preparedStatement.setString(1, account.playerUniqueId().toString());
-                preparedStatement.setString(2, account.playerName());
+                var hashedPassword = account.hashedPassword();
+                if (hashedPassword != null && hashedPassword.isPresent()) {
+                    preparedStatement.setString(3, hashedPassword.get());
+                } else {
+                    preparedStatement.setString(3, null);
+                }
 
-                try {
-                    var hashedPassword = account.hashedPassword();
-                    if (hashedPassword != null && hashedPassword.isPresent()) {
-                        preparedStatement.setString(3, hashedPassword.get());
-                    } else {
-                        preparedStatement.setString(3, null);
-                    }
+                var playerLicenseId = account.playerLicenseId();
+                if (playerLicenseId != null && playerLicenseId.isPresent()) {
+                    preparedStatement.setString(4, playerLicenseId.get().toString());
+                } else {
+                    preparedStatement.setString(4, null);
+                }
 
-                    var playerLicenseId = account.playerLicenseId();
-                    if (playerLicenseId != null && playerLicenseId.isPresent()) {
-                        preparedStatement.setString(4, playerLicenseId.get().toString());
-                    } else {
-                        preparedStatement.setString(4, null);
-                    }
+                var lastLoggedAddress = account.lastLoggedAddress();
+                if (lastLoggedAddress != null && lastLoggedAddress.isPresent()) {
+                    preparedStatement.setString(5, lastLoggedAddress.get().getHostAddress());
+                } else {
+                    preparedStatement.setString(5, null);
+                }
 
-                    var lastLoggedAddress = account.lastLoggedAddress();
-                    if (lastLoggedAddress != null && lastLoggedAddress.isPresent()) {
-                        preparedStatement.setString(5, lastLoggedAddress.get().getHostAddress());
-                    } else {
-                        preparedStatement.setString(5, null);
-                    }
-
-                    var sessionEndDate = account.sessionEndDate();
-                    if (sessionEndDate != null && sessionEndDate.isPresent()) {
-                        preparedStatement.setTimestamp(6, sessionEndDate.get());
-                    } else {
-                        preparedStatement.setString(6, null);
-                    }
-                } catch (Exception exception) {
-                    throw new RuntimeException(exception);
+                var sessionEndDate = account.sessionEndDate();
+                if (sessionEndDate != null && sessionEndDate.isPresent()) {
+                    preparedStatement.setTimestamp(6, sessionEndDate.get());
+                } else {
+                    preparedStatement.setString(6, null);
                 }
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
             }
-        }));
+        }).execute());
     }
 
     @Override
     public void makeAccount(AuthenticAccount account) {
         var query = sqlFileReader.query("makeAccount");
 
-        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query(), preparedStatement -> {
+        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
+            preparedStatement.setString(1, account.playerUniqueId().toString());
+            preparedStatement.setString(2, account.playerName());
+
             try {
-                preparedStatement.setString(1, account.playerUniqueId().toString());
-                preparedStatement.setString(2, account.playerName());
+                var hashedPassword = account.hashedPassword();
+                if (hashedPassword != null && hashedPassword.isPresent()) {
+                    preparedStatement.setString(3, hashedPassword.get());
+                } else {
+                    preparedStatement.setString(3, null);
+                }
 
-                try {
-                    var hashedPassword = account.hashedPassword();
-                    if (hashedPassword != null && hashedPassword.isPresent()) {
-                        preparedStatement.setString(3, hashedPassword.get());
-                    } else {
-                        preparedStatement.setString(3, null);
-                    }
+                var playerLicenseId = account.playerLicenseId();
+                if (playerLicenseId != null && playerLicenseId.isPresent()) {
+                    preparedStatement.setString(4, playerLicenseId.get().toString());
+                } else {
+                    preparedStatement.setString(4, null);
+                }
 
-                    var playerLicenseId = account.playerLicenseId();
-                    if (playerLicenseId != null && playerLicenseId.isPresent()) {
-                        preparedStatement.setString(4, playerLicenseId.get().toString());
-                    } else {
-                        preparedStatement.setString(4, null);
-                    }
+                var lastLoggedAddress = account.lastLoggedAddress();
+                if (lastLoggedAddress != null && lastLoggedAddress.isPresent()) {
+                    preparedStatement.setString(5, lastLoggedAddress.get().getHostAddress());
+                } else {
+                    preparedStatement.setString(5, null);
+                }
 
-                    var lastLoggedAddress = account.lastLoggedAddress();
-                    if (lastLoggedAddress != null && lastLoggedAddress.isPresent()) {
-                        preparedStatement.setString(5, lastLoggedAddress.get().getHostAddress());
-                    } else {
-                        preparedStatement.setString(5, null);
-                    }
-
-                    var sessionEndDate = account.sessionEndDate();
-                    if (sessionEndDate != null && sessionEndDate.isPresent()) {
-                        preparedStatement.setTimestamp(6, sessionEndDate.get());
-                    } else {
-                        preparedStatement.setString(6, null);
-                    }
-                } catch (Exception exception) {
-                    throw new RuntimeException(exception);
+                var sessionEndDate = account.sessionEndDate();
+                if (sessionEndDate != null && sessionEndDate.isPresent()) {
+                    preparedStatement.setTimestamp(6, sessionEndDate.get());
+                } else {
+                    preparedStatement.setString(6, null);
                 }
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
             }
-        }));
+        }).execute());
     }
 
-    public void close(boolean silent) {
-        try {
-            if (silent) {
-                connection.closeSilent();
-            } else {
-                connection.close();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public void reconnect() {
+        var query = sqlFileReader.query("reconnect");
+        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).execute());
+    }
+
+    public void close() {
+        connection.close();
     }
 }

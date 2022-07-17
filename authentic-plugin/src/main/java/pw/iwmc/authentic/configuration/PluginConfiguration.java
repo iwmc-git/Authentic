@@ -5,15 +5,11 @@ import org.spongepowered.configurate.objectmapping.meta.NodeKey;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import pw.iwmc.authentic.api.configuration.AuthenticConfiguration;
-import pw.iwmc.authentic.api.configuration.nodes.AuthServersNode;
-import pw.iwmc.authentic.api.configuration.nodes.SecurityNode;
-import pw.iwmc.authentic.api.configuration.nodes.StorageNode;
+import pw.iwmc.authentic.api.configuration.nodes.*;
 import pw.iwmc.authentic.api.engine.license.LicenseServerMode;
 import pw.iwmc.authentic.api.engine.login.LoginMode;
 
-import pw.iwmc.authentic.configuration.nodes.PluginAuthServersNode;
-import pw.iwmc.authentic.configuration.nodes.PluginSecurityNode;
-import pw.iwmc.authentic.configuration.nodes.PluginStorageNode;
+import pw.iwmc.authentic.configuration.nodes.*;
 
 @ConfigSerializable
 public class PluginConfiguration implements AuthenticConfiguration {
@@ -32,7 +28,7 @@ public class PluginConfiguration implements AuthenticConfiguration {
 
     @NodeKey
     @Setting("auth-servers")
-    protected PluginAuthServersNode authServersNode = new PluginAuthServersNode();
+    protected PluginServersNode authServersNode = new PluginServersNode();
 
     @NodeKey
     @Setting("security")
@@ -41,6 +37,10 @@ public class PluginConfiguration implements AuthenticConfiguration {
     @NodeKey
     @Setting("storage")
     protected PluginStorageNode storageNode = new PluginStorageNode();
+
+    @NodeKey
+    @Setting("caching")
+    protected PluginCachingNode cachingNode = new PluginCachingNode();
 
     @Override
     public LoginMode loginMode() {
@@ -63,7 +63,7 @@ public class PluginConfiguration implements AuthenticConfiguration {
     }
 
     @Override
-    public AuthServersNode authServers() {
+    public ServersNode authServers() {
         return authServersNode;
     }
 
@@ -75,5 +75,10 @@ public class PluginConfiguration implements AuthenticConfiguration {
     @Override
     public SecurityNode security() {
         return securityNode;
+    }
+
+    @Override
+    public CachingNode caching() {
+        return cachingNode;
     }
 }
