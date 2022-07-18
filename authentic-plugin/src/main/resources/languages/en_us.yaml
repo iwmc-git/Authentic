@@ -1,0 +1,15 @@
+messages:
+  time-out: "Timed out"
+  connected-from-license-name: "You are logged into an account that has a licensed nickname"
+
+  need-register:
+    chat-message: "Registration needed - /register [pass]"
+    titled:
+      title-message: "Need register"
+      subtitle-message: "Command - /register [pass]"
+
+  need-login:
+    chat-message: "Login needed - /login [pass]"
+    titled:
+      title-message: "Need login"
+      subtitle-message: "Command - /login [pass]"

@@ -25,4 +25,7 @@ public interface AuthenticAccount {
     void updateLicenseId(UUID playerLicenseId);
     void updateLastLoggedAddress(InetAddress lastLoggedAddress);
     void updateSessionEndDate(Timestamp sessionEndDate);
+
+    void updateLastConnectedAddress(InetAddress lastConnectedAddress);
+    void updateLastConnectedDate(Timestamp lastConnectedDate);
 }

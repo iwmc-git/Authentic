@@ -30,22 +30,25 @@ public class GameProfileRequestListener {
         authentic.debug("Original UUID - " + id.toString());
 
         var accountOptional = engine.byName(name);
+
+        var loginMode = configuration.loginMode();
+        var prepareId = loginMode == LoginMode.UNIQUE || loginMode == LoginMode.MIXED ? UUID.randomUUID() : id;
+
         if (accountOptional.isEmpty()) {
             authentic.debug("Account not found in cache! Creating new account...");
-
-            var loginMode = configuration.loginMode();
-            var prepareId = loginMode == LoginMode.UNIQUE || loginMode == LoginMode.MIXED ? UUID.randomUUID() : id;
 
             var account = new AuthenticPlayerAccount(prepareId, name);
             engine.makeAccount(account, false);
         }
 
-        var makedOptionalAccount = engine.byName(name);
-        makedOptionalAccount.ifPresent(entry -> {
-            var gameProfile = event.getOriginalProfile();
-            event.setGameProfile(gameProfile.withId(entry.getValue().playerUniqueId()));
+        if (loginMode == LoginMode.UNIQUE || loginMode == LoginMode.MIXED) {
+            var makedOptionalAccount = engine.byName(name);
+            makedOptionalAccount.ifPresent(entry -> {
+                var gameProfile = event.getOriginalProfile();
+                event.setGameProfile(gameProfile.withId(entry.getValue().playerUniqueId()));
 
-            authentic.debug("Unique UUID - " + entry.getValue().playerUniqueId().toString());
-        });
+                authentic.debug("Unique UUID - " + entry.getValue().playerUniqueId().toString());
+            });
+        }
     }
 }

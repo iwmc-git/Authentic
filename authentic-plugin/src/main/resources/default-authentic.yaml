@@ -28,12 +28,6 @@ login-mode: MIXED
 # MOJANG                 ->     Request license UUID only from Mojang.
 #
 # MINETOOLS              ->     Request license UUID only from MineTools.
-#
-# MOJANG_AFTER_MINETOOLS ->     If MineTools license handler is down,
-#                               license UUID will be received from Mojang.
-#
-# MINETOOLS_AFTER_MOJANG ->     If Mojang license handler is down,
-#                               license UUID will be received from MineTools.
 license-server-mode: MINETOOLS
 
 ## Default session time.

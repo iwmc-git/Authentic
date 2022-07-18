@@ -26,7 +26,9 @@ import pw.iwmc.authentic.api.engine.storage.StorageType;
 import pw.iwmc.authentic.configuration.PluginConfiguration;
 import pw.iwmc.authentic.engine.PluginEngine;
 import pw.iwmc.authentic.engine.storage.PluginStorage;
+import pw.iwmc.authentic.license.LicenseRetriever;
 import pw.iwmc.authentic.listeners.GameProfileRequestListener;
+import pw.iwmc.authentic.listeners.PreLoginListener;
 
 import pw.iwmc.libman.api.LibmanAPI;
 import pw.iwmc.libman.api.objects.Dependency;
@@ -48,6 +50,7 @@ public class VelocityAuthentic implements Authentic {
     private PluginConfiguration configuration;
     private PluginEngine engine;
     private PluginStorage storage;
+    private LicenseRetriever retriever;
 
     private PluginDescription description;
 
@@ -127,8 +130,11 @@ public class VelocityAuthentic implements Authentic {
                 .repeat(10, TimeUnit.MINUTES)
                 .schedule();
 
+        this.retriever = new LicenseRetriever();
+
         var eventManager = proxyServer.getEventManager();
         eventManager.register(this, new GameProfileRequestListener());
+        eventManager.register(this, new PreLoginListener());
     }
 
     @Subscribe(order = PostOrder.EARLY)
@@ -216,6 +222,10 @@ public class VelocityAuthentic implements Authentic {
 
     public PluginStorage storage() {
         return storage;
+    }
+
+    public LicenseRetriever retriever() {
+        return retriever;
     }
 
     @Override

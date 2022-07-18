@@ -111,10 +111,12 @@ public class AuthenticPlayerAccount implements AuthenticAccount {
         this.sessionEndDate = sessionEndDate;
     }
 
+    @Override
     public void updateLastConnectedAddress(InetAddress lastConnectedAddress) {
         this.lastConnectedAddress = lastConnectedAddress;
     }
 
+    @Override
     public void updateLastConnectedDate(Timestamp lastConnectedDate) {
         this.lastConnectedDate = lastConnectedDate;
     }

@@ -1,0 +1,15 @@
+messages:
+  time-out: "Время вышло балбес"
+  connected-from-license-name: "Ты зашел с лицензионного ника, нельзя так!"
+
+  need-register:
+    chat-message: "Необходимо зарегаться - /register [пароль]"
+    titled:
+      title-message: "Зарегайся"
+      subtitle-message: "Команда - /register [пароль]"
+
+  need-login:
+    chat-message: "Необходимо залогиниться - /login [пароль]"
+    titled:
+      title-message: "Логинься"
+      subtitle-message: "Команда - /login [пароль]"

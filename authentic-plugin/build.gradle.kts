@@ -7,7 +7,7 @@ plugins {
 dependencies {
     implementation(project(":authentic-api"))
 
-    compileOnly("com.velocitypowered:velocity-api:3.1.2-SNAPSHOT")
+    implementation("com.velocitypowered:velocity-api:3.1.2-SNAPSHOT")
     compileOnly("pw.iwmc.libman:libman-api:1.0.6")
 
     compileOnly("pw.iwmc.noelle:standalone-configuration-common:0.2.2-SNAPSHOT")
