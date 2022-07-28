@@ -23,8 +23,6 @@ import pw.iwmc.authentic.messages.MessageKeys;
 
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class PluginLimboHandler implements LimboSessionHandler {
@@ -122,24 +120,8 @@ public class PluginLimboHandler implements LimboSessionHandler {
             return;
         }
 
-        var securityConfig = configuration.securityConfiguration();
         var messagesConfig = configuration.messagesConfiguration();
         var mainConfig = configuration.mainConfiguration();
-
-        var minLenght = securityConfig.minPasswordLength();
-        var maxLenght = securityConfig.maxPasswordLength();
-
-        if (chat.length() > maxLenght) {
-            var message = messages.message(MessageKeys.PASSWORD_TOO_LONG);
-            player.sendMessage(message);
-            return;
-        }
-
-        if (chat.length() < minLenght) {
-            var message = messages.message(MessageKeys.PASSWORD_TOO_SHORT);
-            player.sendMessage(message);
-            return;
-        }
 
         var unsafePasswords = authentic.unsafePasswords();
         var checkPasswordStrength = configuration.securityConfiguration().checkPasswordStrength();
@@ -150,6 +132,23 @@ public class PluginLimboHandler implements LimboSessionHandler {
         }
 
         if (!account.registered()) {
+            var securityConfig = configuration.securityConfiguration();
+
+            var minLenght = securityConfig.minPasswordLength();
+            var maxLenght = securityConfig.maxPasswordLength();
+
+            if (chat.length() > maxLenght) {
+                var message = messages.message(MessageKeys.PASSWORD_TOO_LONG);
+                player.sendMessage(message);
+                return;
+            }
+
+            if (chat.length() < minLenght) {
+                var message = messages.message(MessageKeys.PASSWORD_TOO_SHORT);
+                player.sendMessage(message);
+                return;
+            }
+
             if (mainConfig.registerNeedRepeatPassword()) {
                 var password = chat.split(" ");
 
@@ -170,7 +169,6 @@ public class PluginLimboHandler implements LimboSessionHandler {
                     }
                 }
             }
-
             authentic.defaultLogger().info("Handling account register for " + account.playerName() + "...");
             var hashedPassword = authentic.passwordEncryptor().encode(chat.split(" ")[0]);
 

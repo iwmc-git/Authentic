@@ -22,14 +22,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pw.iwmc.authentic.api.Authentic;
+import pw.iwmc.authentic.commands.LicenseCommand;
 import pw.iwmc.authentic.configuration.PluginConfiguration;
 import pw.iwmc.authentic.floodgate.FloodgateHolder;
 import pw.iwmc.authentic.limbo.PluginLimbo;
 import pw.iwmc.authentic.managers.PluginAccountManager;
 import pw.iwmc.authentic.managers.PluginLicenseManager;
 import pw.iwmc.authentic.managers.PluginStorageManager;
-
 import pw.iwmc.authentic.messages.MessageKeys;
+
 import pw.iwmc.libman.api.LibmanAPI;
 
 import java.nio.file.Files;
@@ -87,6 +88,8 @@ public class VelocityAuthentic implements Authentic {
         if (proxyServer.getPluginManager().getPlugin("floodgate").isPresent()) {
             this.floodgateHolder = new FloodgateHolder();
         }
+
+        registerCommands();
 
         var eventManager = proxyServer.getEventManager();
         eventManager.register(this, new PluginListeners());
@@ -150,6 +153,12 @@ public class VelocityAuthentic implements Authentic {
         var encryprtionMethod = configuration.securityConfiguration().encryptionMethod().name();
         var algorithm = Algorithm.valueOf(encryprtionMethod);
         return PasswordEncryptor.encryptionType(algorithm);
+    }
+
+    private void registerCommands() {
+        var commandManager = proxyServer.getCommandManager();
+
+        commandManager.register("license", new LicenseCommand(), "premium");
     }
 
     private List<String> applyUnsafePasswords() {

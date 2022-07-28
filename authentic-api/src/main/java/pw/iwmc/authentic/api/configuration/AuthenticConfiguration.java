@@ -9,4 +9,5 @@ public interface AuthenticConfiguration {
     AuthenticSecurityConfig securityConfiguration();
     AuthenticStorageConfig storageConfiguration();
     AuthenticMessagesConfig messagesConfiguration();
+    AuthenticCommandsConfig commandsConfiguration();
 }
