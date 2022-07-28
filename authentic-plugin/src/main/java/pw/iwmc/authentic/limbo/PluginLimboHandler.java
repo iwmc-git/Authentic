@@ -184,9 +184,9 @@ public class PluginLimboHandler implements LimboSessionHandler {
                 authentic.defaultLogger().info("Handling account login for " + account.playerName() + "...");
 
                 var hashedPassword = authentic.passwordEncryptor().encode(chat);
-                var currentPassword = account.hashedPassword().get();
+                var currentPassword = account.hashedPassword();
 
-                if (currentPassword.equalsIgnoreCase(hashedPassword)) {
+                if (currentPassword.isPresent() && currentPassword.get().equalsIgnoreCase(hashedPassword)) {
                     var endSessionTime = new Timestamp(System.currentTimeMillis() + mainConfig.sessionTime());
                     var address = player.getRemoteAddress().getAddress();
 

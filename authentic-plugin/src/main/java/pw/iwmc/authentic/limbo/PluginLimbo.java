@@ -34,10 +34,6 @@ public class PluginLimbo {
                 .setGameMode(GameMode.CREATIVE);
     }
 
-    public void passLimboPlayer(Player player) {
-        limboFactory.passLoginLimbo(player);
-    }
-
     public void spawnInLimbo(Player player, LimboSessionHandler handler) {
         authentic.defaultLogger().info("Spawning " + player.getUsername() + " into lobby..");
         limbo.spawnPlayer(player, handler);

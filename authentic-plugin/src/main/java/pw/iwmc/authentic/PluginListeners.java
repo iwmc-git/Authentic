@@ -2,22 +2,13 @@ package pw.iwmc.authentic;
 
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
-import com.velocitypowered.api.event.connection.LoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
-import com.velocitypowered.api.event.connection.PreLoginEvent;
-import com.velocitypowered.api.event.player.GameProfileRequestEvent;
 
-import com.velocitypowered.api.event.player.PlayerChooseInitialServerEvent;
-import com.velocitypowered.api.event.player.ServerPostConnectEvent;
-import com.velocitypowered.api.proxy.ServerConnection;
-import com.velocitypowered.api.util.GameProfile;
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
-
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+
 import pw.iwmc.authentic.account.PluginAccount;
 import pw.iwmc.authentic.configuration.PluginConfiguration;
-import pw.iwmc.authentic.limbo.PluginLimboHandler;
 import pw.iwmc.authentic.managers.PluginAccountManager;
 import pw.iwmc.authentic.managers.PluginLicenseManager;
 import pw.iwmc.authentic.managers.PluginStorageManager;
@@ -44,7 +35,11 @@ public class PluginListeners {
         var messages = authentic.messages();
 
         var player = event.getPlayer();
-        var account = accountManager.accountById(player.getUniqueId()).get();
+        var account = accountManager.accountById(player.getUniqueId());
+
+        if (account.isEmpty()) {
+            return;
+        }
 
         var scheduler = authentic.proxyServer().getScheduler();
 
@@ -67,7 +62,7 @@ public class PluginListeners {
         }
 
         scheduler.buildTask(authentic, () -> {
-            if (!account.licensed()) {
+            if (!account.get().licensed()) {
                 var message = messages.message(MessageKeys.LOGIN_FROM_SESSION_MESSAGE);
                 player.sendMessage(message);
 
@@ -143,15 +138,6 @@ public class PluginListeners {
 
             account.updateLastConnectedDate(connectionDate);
             account.updateLastConnectedAddress(connectionAddress);
-
-            System.out.println(account.playerName());
-            System.out.println(account.playerUniqueId());
-
-            System.out.println(account.hashedPassword());
-            System.out.println(account.sessionEndDate());
-
-            System.out.println("registered - " + account.registered());
-            System.out.println("logged - " + account.logged());
 
             if (!account.registered() || !account.logged()) {
                 event.addOnJoinCallback(() -> accountManager.authorize(event.getPlayer(), account));

@@ -191,8 +191,6 @@ public class PluginStorageManager implements AuthenticStorageManager {
                     preparedStatement.setString(3, null);
                 }
 
-                System.out.println(hashedPassword);
-
                 var playerLicenseId = account.playerLicenseId();
                 if (playerLicenseId != null && playerLicenseId.isPresent()) {
                     preparedStatement.setString(4, playerLicenseId.get().toString());
@@ -223,9 +221,10 @@ public class PluginStorageManager implements AuthenticStorageManager {
     public void dropAccount(AuthenticAccount account) {
         var query = sqlFileReader.query("dropAccount");
 
-        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
-            preparedStatement.setString(1, account.playerUniqueId().toString());
-        }).execute());
+        query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query())
+                .prepare(preparedStatement -> preparedStatement.setString(1, account.playerUniqueId().toString()))
+                .execute()
+        );
     }
 
     // =================== Private methods =================== //
@@ -284,6 +283,7 @@ public class PluginStorageManager implements AuthenticStorageManager {
                 case H2 -> getClass().getClassLoader().getResourceAsStream(resourcePath + "h2-schema.sql");
             };
 
+            assert resource != null;
             return SQLFileReader.readStream(resource);
         } catch (Exception exception) {
             throw new RuntimeException(exception);

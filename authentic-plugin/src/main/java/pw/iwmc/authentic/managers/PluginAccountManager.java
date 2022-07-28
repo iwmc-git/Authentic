@@ -52,8 +52,6 @@ public class PluginAccountManager implements AuthenticAccountManager {
             var message = messages.message(MessageKeys.INVALID_NAME);
             player.disconnect(message);
         }
-
-        //authentic.limbo().passLimboPlayer(player);
     }
 
     public ConcurrentMap<String, Runnable> postLoginTasks() {
