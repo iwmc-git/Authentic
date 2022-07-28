@@ -46,8 +46,6 @@ public class PluginStorageManager implements AuthenticStorageManager {
 
         makeTable();
         mapInCache();
-
-        sqlFileReader.allQueries().forEach(sqlQuery -> System.out.println(sqlQuery.name()));
     }
 
     public void close() {
