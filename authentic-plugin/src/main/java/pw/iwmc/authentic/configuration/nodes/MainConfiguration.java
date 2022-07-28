@@ -29,14 +29,6 @@ public class MainConfiguration implements AuthenticMainConfig {
     @Setting("register-need-repeat-password")
     protected boolean registerNeedRepeatPassword = true;
 
-    @Setting("initial-servers")
-    protected List<String> initialServers = new ArrayList<>();
-
-    @Override
-    public List<String> initialServers() {
-        return initialServers;
-    }
-
     @Override
     public long sessionTime() {
         return sessionTime;

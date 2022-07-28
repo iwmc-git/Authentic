@@ -28,7 +28,10 @@ messages:
         register-required-message: "%prefix% <gray>Please enter your password in chat!"
         register-required-title: "<b><green>AUTHENTIC</green></b>"
         register-required-subtitle: "<gray>Enter your password in chat!"
-    
+        
+        register-need-repeat: "%prefix% <gray>You need to repeat your password!"
+        register-repeat-password-not-match: "%prefix% <gray>The repeat password does not match the initial one"
+        
     success:
         login-from-session-message: "%prefix% <gray>You have successfully logged from session!"
         login-from-session-title: "<b><green>AUTHENTIC</green></b>"

@@ -26,6 +26,9 @@ public class MessageKeys {
     public final static MessageKey REGISTER_REQUIRED_SUBTITLE = MessageKey.of("messages.required.register-required-subtitle");
     public final static MessageKey REGISTER_BOSSBAR_REMAINING = MessageKey.of("messages.required.bossbar-register-remaining-message");
 
+    public final static MessageKey REGISTER_NEED_REPEAT_MESSAGE = MessageKey.of("messages.required.register-need-repeat");
+    public final static MessageKey REGISTER_REPEAT_PASSWORD_NOT_MATCH_MESSAGE = MessageKey.of("messages.required.register-repeat-password-not-match");
+
     public final static MessageKey LOGIN_FROM_SESSION_MESSAGE = MessageKey.of("messages.success.login-from-session-message");
     public final static MessageKey LOGIN_FROM_SESSION_TITLE = MessageKey.of("messages.success.login-from-session-title");
     public final static MessageKey LOGIN_FROM_SESSION_SUBTITLE = MessageKey.of("messages.success.login-from-session-subtitle");
