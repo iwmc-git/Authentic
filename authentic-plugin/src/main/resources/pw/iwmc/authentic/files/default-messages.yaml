@@ -15,6 +15,8 @@ messages:
     password-too-long: "%prefix% <gray>Your password is too long!</gray>"
     password-too-short: "%prefix% <gray>Your password is too short!</gray>"
     
+    slash-first: "%prefix% <gray>The password must be entered as a message in the chat, and not using a slash!"
+    
     required:
         bossbar-login-remaining-message: "<gray>You have <blue>%time% <gray>seconds left to login!"
         bossbar-register-remaining-message: "<gray>You have <blue>%time% <gray>seconds left to register!"

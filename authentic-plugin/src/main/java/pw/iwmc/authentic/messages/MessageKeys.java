@@ -8,6 +8,8 @@ public class MessageKeys {
     public final static MessageKey INVALID_NAME = MessageKey.of("messages.invalid-name");
     public final static MessageKey TIME_OUT = MessageKey.of("messages.time-out");
 
+    public final static MessageKey SLASH_FIRST = MessageKey.of("messages.slash-first");
+
     public final static MessageKey UNSAFE_PASSWORD = MessageKey.of("messages.unsafe-password");
     public final static MessageKey UNKNOWN_PASSWORD = MessageKey.of("messages.unknown-password");
 

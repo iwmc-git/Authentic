@@ -114,6 +114,12 @@ public class PluginLimboHandler implements LimboSessionHandler {
 
     @Override
     public void onChat(String chat) {
+        if (chat.startsWith("/")) {
+            var message = messages.message(MessageKeys.SLASH_FIRST);
+            player.sendMessage(message);
+            return;
+        }
+
         var securityConfig = configuration.securityConfiguration();
         var messagesConfig = configuration.messagesConfiguration();
         var mainConfig = configuration.mainConfiguration();
