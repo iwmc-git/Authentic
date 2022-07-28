@@ -84,13 +84,21 @@ public class PluginAccountManager implements AuthenticAccountManager {
     @Override
     public void addAccount(AuthenticAccount account) {
         authentic.defaultLogger().info("Adding " + account.playerName() + "`s account in cache...");
-        cachedAccounts.put(account.playerUniqueId(), account);
+
+        if (cachedAccounts.get(account.playerUniqueId()) == null) {
+            authentic.defaultLogger().info(account.playerName() + "`s not exists in cache! Adding...");
+            cachedAccounts.put(account.playerUniqueId(), account);
+        }
     }
 
     @Override
     public void removeAccount(AuthenticAccount account) {
         authentic.defaultLogger().info("Deleting " + account.playerName() + "`s account in cache...");
-        cachedAccounts.remove(account.playerUniqueId(), account);
+
+        if (cachedAccounts.get(account.playerUniqueId()) != null) {
+            authentic.defaultLogger().info(account.playerName() + "`s exists in cache! Removing...");
+            cachedAccounts.remove(account.playerUniqueId(), account);
+        }
     }
 
     @Override

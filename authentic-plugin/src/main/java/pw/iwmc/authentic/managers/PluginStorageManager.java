@@ -125,6 +125,7 @@ public class PluginStorageManager implements AuthenticStorageManager {
             return;
         }
 
+        authentic.defaultLogger().info("Creating account for " + account.playerName() + " in database...");
         var query = sqlFileReader.query("makeAccount");
 
         query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
@@ -173,6 +174,7 @@ public class PluginStorageManager implements AuthenticStorageManager {
             return;
         }
 
+        authentic.defaultLogger().info("Updating " + account.playerName() + " account in database...");
         var query = sqlFileReader.query("updateAccount");
 
         query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
