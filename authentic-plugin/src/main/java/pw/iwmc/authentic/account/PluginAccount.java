@@ -84,7 +84,7 @@ public class PluginAccount implements AuthenticAccount {
             return false;
         }
 
-        if (!lastLoggedAddress.getHostAddress().equalsIgnoreCase( lastConnectedAddress.getHostAddress())) {
+        if (!lastLoggedAddress.getHostAddress().equalsIgnoreCase(lastConnectedAddress.getHostAddress())) {
             return false;
         }
 

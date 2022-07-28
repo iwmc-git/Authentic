@@ -17,6 +17,9 @@ messages:
     
     slash-first: "%prefix% <gray>The password must be entered as a message in the chat, and not using a slash!"
     
+    license-command:
+    
+    
     required:
         bossbar-login-remaining-message: "<gray>You have <blue>%time% <gray>seconds left to login!"
         bossbar-register-remaining-message: "<gray>You have <blue>%time% <gray>seconds left to register!"

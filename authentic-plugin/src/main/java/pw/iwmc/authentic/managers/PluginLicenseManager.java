@@ -29,7 +29,9 @@ public class PluginLicenseManager implements AuthenticLicenseManager {
 
         try (var stream = new URL(url).openStream()) {
             var jsonObject = gson.fromJson(new InputStreamReader(stream), JsonObject.class);
+
             var id = jsonObject.get("id").getAsString();
+            var name = jsonObject.get("name").getAsString();
 
             if (id == null || id.isBlank() || id.isEmpty()) {
                 return null;
@@ -40,7 +42,7 @@ public class PluginLicenseManager implements AuthenticLicenseManager {
                     new BigInteger(id.substring(16, 32), 16).longValue()
             );
 
-            cachedLicenses.putIfAbsent(playerName, performedUuid);
+            cachedLicenses.putIfAbsent(name, performedUuid);
 
             return performedUuid;
         } catch (Exception exception) {
