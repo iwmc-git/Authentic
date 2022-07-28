@@ -9,6 +9,14 @@
     {
       "id": "noelle",
       "optional": false
+    },
+    {
+      "id": "limboapi",
+      "optional": false
+    },
+    {
+      "id": "floodgate",
+      "optional": true
     }
   ],
   "main": "pw.iwmc.authentic.VelocityAuthentic"

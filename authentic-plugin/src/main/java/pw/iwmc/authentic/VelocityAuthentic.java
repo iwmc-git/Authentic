@@ -6,206 +6,122 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.scheduler.ScheduledTask;
 
-import noelle.configuration.yaml.YamlLoader;
-import noelle.features.languages.common.AbstractLanguages;
-import noelle.features.languages.common.backend.BackendType;
-import noelle.features.languages.common.key.LanguageKey;
-import noelle.features.languages.common.language.Language;
-import noelle.features.languages.velocity.VelocityLanguages;
+import noelle.configuration.DefaultConfiguration;
+import noelle.configuration.types.hocon.HoconLoader;
+import noelle.configuration.types.yaml.YamlLoader;
+import noelle.encryptor.Algorithm;
+import noelle.encryptor.PasswordEncryptor;
+import noelle.features.messages.common.AbstractMessages;
+import noelle.features.messages.velocity.VelocityMessages;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import pw.iwmc.authentic.api.Authentic;
-import pw.iwmc.authentic.api.engine.storage.StorageType;
 import pw.iwmc.authentic.configuration.PluginConfiguration;
-import pw.iwmc.authentic.engine.PluginEngine;
-import pw.iwmc.authentic.engine.storage.PluginStorage;
-import pw.iwmc.authentic.license.LicenseRetriever;
-import pw.iwmc.authentic.listeners.GameProfileRequestListener;
-import pw.iwmc.authentic.listeners.PreLoginListener;
+import pw.iwmc.authentic.floodgate.FloodgateHolder;
+import pw.iwmc.authentic.limbo.PluginLimbo;
+import pw.iwmc.authentic.managers.PluginAccountManager;
+import pw.iwmc.authentic.managers.PluginLicenseManager;
+import pw.iwmc.authentic.managers.PluginStorageManager;
 
+import pw.iwmc.authentic.messages.MessageKeys;
 import pw.iwmc.libman.api.LibmanAPI;
-import pw.iwmc.libman.api.objects.Dependency;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 public class VelocityAuthentic implements Authentic {
+    private final Logger defaultLogger = LoggerFactory.getLogger("authentic::default");
+    private final Logger debuggerLogger = LoggerFactory.getLogger("authentic::debug");
+
     private static VelocityAuthentic authentic;
 
     private final ProxyServer proxyServer;
-    private final Logger logger;
     private final Path rootPath;
 
-    private ScheduledTask uploadCacheTask;
-    private ScheduledTask reconnectTask;
+    private FloodgateHolder floodgateHolder;
+    private PluginLimbo limbo;
 
     private PluginConfiguration configuration;
-    private PluginEngine engine;
-    private PluginStorage storage;
-    private LicenseRetriever retriever;
+    private PluginAccountManager accountManager;
+    private PluginLicenseManager licenseManager;
+    private PluginStorageManager storageManager;
 
-    private PluginDescription description;
+    private AbstractMessages<Player> messages;
+    private PasswordEncryptor passwordEncryptor;
 
-    private AbstractLanguages<Player> languages;
+    private List<String> unsafePasswords;
 
     @Inject
-    public VelocityAuthentic(ProxyServer proxyServer, Logger logger, @DataDirectory Path rootPath) {
+    public VelocityAuthentic(ProxyServer proxyServer, @DataDirectory Path rootPath) {
         authentic = this;
 
         this.proxyServer = proxyServer;
-        this.logger = logger;
         this.rootPath = rootPath;
     }
 
-    @Subscribe(order = PostOrder.EARLY)
+    @Subscribe
     public void onProxyInit(ProxyInitializeEvent event) {
-        this.description = this.proxyServer.getPluginManager().fromInstance(this).get().getDescription();
+        defaultLogger.info("Loading plugin...");
 
-        var formattedMessage = String.format("%s v%s is loading now...", this.description.getName().get(), this.description.getVersion().get());
-        this.logger.info(formattedMessage);
+        injectDependencies();
 
-        this.prepare();
-        this.loadConfiguration();
+        loadConfiguration();
+        loadMessages();
 
-        var storageNode = configuration.storage();
-        var type = storageNode.storageType();
-        if (type == StorageType.MARIADB) {
-            var username = storageNode.user();
-            if (username.equalsIgnoreCase("username")) {
-                logger.error("Database section contains default value! (username: username)");
-                return;
-            }
+        this.limbo = new PluginLimbo();
 
-            var password = storageNode.password();
-            if (password.equalsIgnoreCase("password")) {
-                logger.error("Database section contains default value! (password: password)");
-                return;
-            }
+        this.accountManager = new PluginAccountManager();
+        this.storageManager = new PluginStorageManager();
+        this.licenseManager = new PluginLicenseManager();
 
-            var database = storageNode.database();
-            if (database.equalsIgnoreCase("database")) {
-                logger.error("Database section contains default value! (database: database)");
-                return;
-            }
+        this.unsafePasswords = applyUnsafePasswords();
+        this.passwordEncryptor = applyEncryptor();
+
+        if (proxyServer.getPluginManager().getPlugin("floodgate").isPresent()) {
+            this.floodgateHolder = new FloodgateHolder();
         }
-
-        var defaultLanguageRaw = configuration.defaultLanguage();
-        var optionalLanguage = Language.fromKey(LanguageKey.of(defaultLanguageRaw));
-
-        if (optionalLanguage.isEmpty()) {
-            logger.error("Invalid locale detected - " + defaultLanguageRaw);
-            return;
-        }
-
-        this.languages = VelocityLanguages.init(
-                BackendType.YAML,
-                rootPath,
-                optionalLanguage.get(),
-                VelocityAuthentic.class,
-                "default-authentic.yaml"
-        );
-
-        this.languages.init();
-
-        this.engine = new PluginEngine();
-        this.storage = new PluginStorage();
-
-        this.uploadCacheTask = proxyServer.getScheduler()
-                .buildTask(authentic, () -> engine.uploadCache())
-                .delay(configuration.caching().cachingTime())
-                .repeat(configuration.caching().cachingTime())
-                .schedule();
-
-        this.reconnectTask = proxyServer.getScheduler()
-                .buildTask(this, () -> storage.reconnect())
-                .delay(10, TimeUnit.MINUTES)
-                .repeat(10, TimeUnit.MINUTES)
-                .schedule();
-
-        this.retriever = new LicenseRetriever();
 
         var eventManager = proxyServer.getEventManager();
-        eventManager.register(this, new GameProfileRequestListener());
-        eventManager.register(this, new PreLoginListener());
+        eventManager.register(this, new PluginListeners());
     }
 
     @Subscribe(order = PostOrder.EARLY)
     public void onProxyShutdown(ProxyShutdownEvent event) {
-        var formattedMessage = String.format("%s v%s is stopping now...", this.description.getName().get(), this.description.getVersion().get());
-        this.logger.info(formattedMessage);
+        defaultLogger.info("Disabling plugin...");
 
-        reconnectTask.cancel();
-        uploadCacheTask.cancel();
+        var cachedAccounts = accountManager.cachedAccounts();
 
-        storage.close();
-    }
+        defaultLogger.info("Updating " + cachedAccounts.size() + " in database...");
+        cachedAccounts.forEach((key, value) -> storageManager.updateAccount(value));
 
-    private void prepare() {
-        debug("Downloading plugin dependencies...");
-
-        var caffeineDependency = Dependency.of("com.github.ben-manes.caffeine:caffeine:3.1.1");
-        var libman = LibmanAPI.libman();
-
-        var downloaded = libman.downloaded();
-        var downloader = libman.downloader();
-
-        downloader.downloadDependency(caffeineDependency);
-
-        debug("Injecting dependencies...");
-        downloaded.forEach((key, value) -> inject(value));
-    }
-
-    private void inject(Path path) {
-        this.proxyServer.getPluginManager().addToClasspath(this, path);
-    }
-
-    private void loadConfiguration() {
-        debug("Loading configuration...");
-
-        try {
-            if (Files.notExists(rootPath)) {
-                Files.createDirectory(rootPath);
-            }
-
-            var resource = getClass().getClassLoader().getResourceAsStream("default-authentic.yaml");
-            if (resource == null) {
-                throw new RuntimeException("Default configuration not found!");
-            }
-
-            var configFile = rootPath.resolve("authentic.yaml");
-            if (Files.notExists(configFile)) {
-                Files.copy(resource, configFile);
-            }
-
-            debug("Mapping configuration via object mapper...");
-            this.configuration = YamlLoader.loader(configFile).configuration().value(PluginConfiguration.class);
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
-        }
+        storageManager.close();
     }
 
     public static VelocityAuthentic authentic() {
         return authentic;
     }
 
-    public void debug(String message) {
-        var debug = configuration.debug();
-
-        if (debug) {
-            logger.warn(message);
-        }
+    public FloodgateHolder floodgateHolder() {
+        return floodgateHolder;
     }
 
-    public Logger logger() {
-        return logger;
+    public PluginLimbo limbo() {
+        return limbo;
+    }
+
+    public List<String> unsafePasswords() {
+        return unsafePasswords;
+    }
+
+    public AbstractMessages<Player> messages() {
+        return messages;
     }
 
     public Path rootPath() {
@@ -216,25 +132,120 @@ public class VelocityAuthentic implements Authentic {
         return proxyServer;
     }
 
-    public AbstractLanguages<Player> languages() {
-        return languages;
+    public Logger defaultLogger() {
+        return defaultLogger;
     }
 
-    public PluginStorage storage() {
-        return storage;
+    public Logger debuggerLogger() {
+        return debuggerLogger;
     }
 
-    public LicenseRetriever retriever() {
-        return retriever;
+    public PasswordEncryptor passwordEncryptor() {
+        return passwordEncryptor;
     }
 
-    @Override
-    public PluginEngine engine() {
-        return engine;
+    // =================== Private methods =================== //
+
+    private PasswordEncryptor applyEncryptor() {
+        var encryprtionMethod = configuration.securityConfiguration().encryptionMethod().name();
+        var algorithm = Algorithm.valueOf(encryprtionMethod);
+        return PasswordEncryptor.encryptionType(algorithm);
     }
+
+    private List<String> applyUnsafePasswords() {
+        try {
+            var resource = getClass().getClassLoader().getResourceAsStream("pw/iwmc/authentic/files/unsafe-passwords.txt");
+            if (resource == null) {
+                throw new RuntimeException("unsafe password not found in JAR!!");
+            }
+
+            var unsafePasswordsPath = rootPath.resolve("unsafe-passwords.txt");
+            if (Files.notExists(unsafePasswordsPath)) {
+                Files.copy(resource, unsafePasswordsPath);
+            }
+
+            var passwordsList = Files.lines(unsafePasswordsPath).toList();
+            defaultLogger.info("Applying " + passwordsList.size() + " usafe passwords...");
+
+            return passwordsList;
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    private void injectDependencies() {
+        var libman = LibmanAPI.libman();
+        var downloaded = libman.downloaded();
+
+        defaultLogger.info("Injecting " + downloaded.size() + " dependencies...");
+        downloaded.forEach((key, value) -> proxyServer.getPluginManager().addToClasspath(this, value));
+    }
+
+    private void loadMessages() {
+        defaultLogger.info("Loading messages...");
+
+        var messagesConfig = loadDefaultConfiguration("default-messages.yaml", "messages.yaml");
+        var prefixKey = MessageKeys.PREFIX;
+
+        this.messages = VelocityMessages.init(messagesConfig);
+        this.messages.applyPrefix(prefixKey, "%prefix%");
+    }
+
+    private void loadConfiguration() {
+        defaultLogger.info("Loading configuration...");
+
+        var rawConfig = loadDefaultConfiguration("default-authentic.conf", "authentic.conf");
+        this.configuration = rawConfig.value(PluginConfiguration.class);
+    }
+
+    private DefaultConfiguration<?> loadDefaultConfiguration(String includedName, String outputName) {
+        try {
+            if (Files.notExists(rootPath)) {
+                defaultLogger.info("Creating plugin directory...");
+                Files.createDirectory(rootPath);
+            }
+
+            var resource = getClass().getClassLoader().getResourceAsStream("pw/iwmc/authentic/files/" + includedName);
+            if (resource == null) {
+                throw new RuntimeException(includedName + " configuration not found!");
+            }
+
+            var configFile = rootPath.resolve(outputName);
+            if (Files.notExists(configFile)) {
+                defaultLogger.info("Copying configuration file - " + includedName);
+                Files.copy(resource, configFile);
+            }
+
+            defaultLogger.info("Loading configuration file - " + outputName);
+            if (includedName.endsWith(".conf") && outputName.endsWith(".conf")) {
+                return HoconLoader.loader(configFile).configuration();
+            } else {
+                return YamlLoader.loader(configFile).configuration();
+            }
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
+    }
+
+    // =================== API getter methods =================== //
 
     @Override
     public PluginConfiguration configuration() {
         return configuration;
+    }
+
+    @Override
+    public PluginAccountManager accountManager() {
+        return accountManager;
+    }
+
+    @Override
+    public PluginStorageManager storageManager() {
+        return storageManager;
+    }
+
+    @Override
+    public PluginLicenseManager licenseManager() {
+        return licenseManager;
     }
 }

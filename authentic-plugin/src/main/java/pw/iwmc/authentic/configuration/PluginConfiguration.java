@@ -5,88 +5,63 @@ import org.spongepowered.configurate.objectmapping.meta.NodeKey;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import pw.iwmc.authentic.api.configuration.AuthenticConfiguration;
-import pw.iwmc.authentic.api.configuration.nodes.*;
-import pw.iwmc.authentic.api.engine.license.LicenseServerMode;
-import pw.iwmc.authentic.api.engine.login.LoginMode;
 
 import pw.iwmc.authentic.configuration.nodes.*;
 
 @ConfigSerializable
 public class PluginConfiguration implements AuthenticConfiguration {
 
-    @Setting("login-mode")
-    protected LoginMode loginMode = LoginMode.UNIQUE;
-
-    @Setting("license-server-mode")
-    protected LicenseServerMode licenseServerMode = LicenseServerMode.MINETOOLS;
-
-    @Setting("session-time")
-    protected long sessionTime = 10080;
-
-    @Setting("debug")
-    protected boolean debug = true;
-
-    @Setting("default-language")
-    protected String defaultLanguage = "en_us";
+    @NodeKey
+    @Setting("main-settings")
+    protected MainConfiguration mainConfiguration = new MainConfiguration();
 
     @NodeKey
-    @Setting("auth-servers")
-    protected PluginServersNode authServersNode = new PluginServersNode();
+    @Setting("limbo-settings")
+    protected LimboConfiguration limboConfiguration = new LimboConfiguration();
 
     @NodeKey
-    @Setting("security")
-    protected PluginSecurityNode securityNode = new PluginSecurityNode();
+    @Setting("totp-settings")
+    protected TotpConfiguration totpConfiguration = new TotpConfiguration();
 
     @NodeKey
-    @Setting("storage")
-    protected PluginStorageNode storageNode = new PluginStorageNode();
+    @Setting("security-settings")
+    protected SecurityConfiguration securityConfiguration = new SecurityConfiguration();
 
     @NodeKey
-    @Setting("caching")
-    protected PluginCachingNode cachingNode = new PluginCachingNode();
+    @Setting("storage-settings")
+    protected StorageConfiguration storageConfiguration = new StorageConfiguration();
+
+    @NodeKey
+    @Setting("messages-settings")
+    protected MessagesConfiguration messagesConfiguration = new MessagesConfiguration();
 
     @Override
-    public LoginMode loginMode() {
-        return loginMode;
+    public MainConfiguration mainConfiguration() {
+        return mainConfiguration;
     }
 
     @Override
-    public LicenseServerMode licenseServerMode() {
-        return licenseServerMode;
+    public LimboConfiguration limboConfiguration() {
+        return limboConfiguration;
     }
 
     @Override
-    public String defaultLanguage() {
-        return defaultLanguage.toLowerCase();
+    public TotpConfiguration totpConfiguration() {
+        return totpConfiguration;
     }
 
     @Override
-    public long sessionTime() {
-        return sessionTime;
+    public SecurityConfiguration securityConfiguration() {
+        return securityConfiguration;
     }
 
     @Override
-    public boolean debug() {
-        return debug;
+    public StorageConfiguration storageConfiguration() {
+        return storageConfiguration;
     }
 
     @Override
-    public ServersNode authServers() {
-        return authServersNode;
-    }
-
-    @Override
-    public StorageNode storage() {
-        return storageNode;
-    }
-
-    @Override
-    public SecurityNode security() {
-        return securityNode;
-    }
-
-    @Override
-    public CachingNode caching() {
-        return cachingNode;
+    public MessagesConfiguration messagesConfiguration() {
+        return messagesConfiguration;
     }
 }

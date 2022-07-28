@@ -24,6 +24,8 @@ allprojects {
         maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
         maven { url = uri("https://repo.spongepowered.org/repository/maven-public/") }
         maven { url = uri("https://papermc.io/repo/repository/maven-public/") }
+        maven { url = uri("https://repo.opencollab.dev/maven-snapshots/") }
+        maven { url = uri("https://repo.panda-lang.org/releases") }
         maven { url = uri("https://maven.elytrium.net/repo/") }
         maven { url = uri("https://maven.iwmc.pw/snapshots/") }
         maven { url = uri("https://maven.iwmc.pw/releases/") }

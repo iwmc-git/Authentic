@@ -1,0 +1,47 @@
+messages:
+    prefix: "<color:#12ffa0><b>❖</color> <dark_gray><b>•</dark_gray>"
+    
+    invalid-name: |-
+        <gray>Your nickname contains <red>incorrect <gray>characters or the <red>wrong <gray>length.
+        <gray>Change your nickname and <green>login <gray>again!
+    
+    time-out: |-
+        <gray>Your <yellow>authorization <gray>time has <red>expired<gray>.
+        <green>Connect <gray>to the server and <green>try <gray>again!
+    
+    unsafe-passwor: "%prefix% <gray>Your password is unsafe!</gray>"
+    unknown-password: "%prefix% <gray>Unknown password!</gray>"
+    
+    password-too-long: "%prefix% <gray>Your password is too long!</gray>"
+    password-too-short: "%prefix% <gray>Your password is too short!</gray>"
+    
+    required:
+        bossbar-login-remaining-message: "<gray>You have <blue>%time% <gray>seconds left to login!"
+        bossbar-register-remaining-message: "<gray>You have <blue>%time% <gray>seconds left to register!"
+        
+        login-required-message: "%prefix% <gray>Please enter your password in chat!"
+        login-required-title: "<b><green>AUTHENTIC</green></b>"
+        login-required-subtitle: "<gray>Enter your password in chat!"
+        
+        register-required-message: "%prefix% <gray>Please enter your password in chat!"
+        register-required-title: "<b><green>AUTHENTIC</green></b>"
+        register-required-subtitle: "<gray>Enter your password in chat!"
+    
+    success:
+        login-from-session-message: "%prefix% <gray>You have successfully logged from session!"
+        login-from-session-title: "<b><green>AUTHENTIC</green></b>"
+        login-from-session-subtitle: "<gray>Your session has been restored!"
+        
+        login-from-license-message: "%prefix% <gray>You have successfully logged using license account!"
+        login-from-license-title: "<b><green>AUTHENTIC</green></b>"
+        login-from-license-subtitle: "<gray>Success login into account!"
+        
+        login-success-message: "%prefix% <gray>You have successfully logged into your account!"
+        login-success-title: "<b><green>AUTHENTIC</green></b>"
+        login-success-subtitle: "<gray>Success login into account!"
+        login-success-hover: "%prefix% <gray>Hover <hover:show_text:'<gray>Your password<dark_gray>: <green>%password%'><green><b>HERE</b></hover> <gray>for the password!"
+        
+        register-success-message: "%prefix% <gray>You have successfully register your account!"
+        register-success-title: "<b><green>AUTHENTIC</green></b>"
+        register-success-subtitle: "<gray>Account success registered!"
+        register-success-hover: "%prefix% <gray>Hover <hover:show_text:'<gray>Your password<dark_gray>: <green>%password%'><green><b>HERE</b></hover> <gray>for the password!"
