@@ -6,10 +6,7 @@ import dev.rollczi.litecommands.LiteCommands;
 import dev.rollczi.litecommands.velocity.LiteVelocityFactory;
 
 import pw.iwmc.authentic.VelocityAuthentic;
-import pw.iwmc.authentic.commands.ChangePasswordCommand;
-import pw.iwmc.authentic.commands.LicenseCommand;
-import pw.iwmc.authentic.commands.LogoutCommand;
-import pw.iwmc.authentic.commands.UnregisterCommand;
+import pw.iwmc.authentic.commands.*;
 
 public class PluginCommandsManager {
     private final VelocityAuthentic authentic = VelocityAuthentic.authentic();
@@ -21,6 +18,7 @@ public class PluginCommandsManager {
                 .command(UnregisterCommand.class)
                 .command(LogoutCommand.class)
                 .command(LicenseCommand.class)
+                .command(TotpCommand.class)
                 .register();
 
     }

@@ -4,8 +4,8 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
-
 import com.velocitypowered.api.event.player.GameProfileRequestEvent;
+
 import net.elytrium.limboapi.api.event.LoginLimboRegisterEvent;
 import net.kyori.adventure.title.Title;
 
@@ -18,7 +18,6 @@ import pw.iwmc.authentic.messages.MessageKeys;
 
 import java.sql.Timestamp;
 import java.time.Duration;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class PluginListeners {
@@ -128,7 +127,7 @@ public class PluginListeners {
                 player.sendMessage(message);
 
                 if (messagesConfig.titlesEnabled()) {
-                    var registerSuccess = messagesConfig.registeredTitleSettings();
+                    var registerSuccess = messagesConfig.licenseLoggedTitleSettings();
 
                     var titleMessage = messages.message(MessageKeys.LOGIN_FROM_LICENSE_TITLE);
                     var subtitleMessage = messages.message(MessageKeys.LOGIN_FROM_LICENSE_SUBTITLE);
@@ -147,7 +146,7 @@ public class PluginListeners {
                 player.sendMessage(message);
 
                 if (messagesConfig.titlesEnabled()) {
-                    var registerSuccess = messagesConfig.registeredTitleSettings();
+                    var registerSuccess = messagesConfig.loggedTitleSettings();
 
                     var titleMessage = messages.message(MessageKeys.LOGIN_FROM_SESSION_TITLE);
                     var subtitleMessage = messages.message(MessageKeys.LOGIN_FROM_SESSION_SUBTITLE);
@@ -225,12 +224,7 @@ public class PluginListeners {
             account.updateLastConnectedDate(connectionDate);
             account.updateLastConnectedAddress(connectionAddress);
 
-            var autoLogin = mainConfig.licensedAutologin();
-            var licensed = account.licensed();
-
-            System.out.println(licensed);
-
-            if (licensed) {
+            if (account.licensed()) {
                 return;
             }
 

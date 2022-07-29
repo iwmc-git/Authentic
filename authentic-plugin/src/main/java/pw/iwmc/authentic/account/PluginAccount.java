@@ -9,7 +9,9 @@ import java.util.UUID;
 
 public class PluginAccount implements AuthenticAccount {
     private final String playerName;
-    private UUID playerUniqueId;
+    private final UUID playerUniqueId;
+
+    private String totpToken;
 
     private Timestamp lastConnectedDate;
     private InetAddress lastConnectedAddress;
@@ -18,6 +20,8 @@ public class PluginAccount implements AuthenticAccount {
     private String hashedPassword;
     private InetAddress lastLoggedAddress;
     private Timestamp sessionEndDate;
+
+    private boolean passedLogin;
 
     public PluginAccount(String playerName, UUID playerUniqueId) {
         this.playerName = playerName;
@@ -42,6 +46,11 @@ public class PluginAccount implements AuthenticAccount {
     @Override
     public Timestamp lastConnectedDate() {
         return lastConnectedDate;
+    }
+
+    @Override
+    public Optional<String> totpToken() {
+        return Optional.ofNullable(totpToken);
     }
 
     @Override
@@ -92,6 +101,21 @@ public class PluginAccount implements AuthenticAccount {
     }
 
     @Override
+    public boolean passedLogin() {
+        return passedLogin;
+    }
+
+    @Override
+    public void passLogin(boolean pass) {
+        this.passedLogin = pass;
+    }
+
+    @Override
+    public boolean hasTotp() {
+        return totpToken != null;
+    }
+
+    @Override
     public void updateHashedPassword(String hashedPassword) {
         this.hashedPassword = hashedPassword;
     }
@@ -112,8 +136,8 @@ public class PluginAccount implements AuthenticAccount {
     }
 
     @Override
-    public void updateUniqueId(UUID playerUniqueId) {
-        this.playerUniqueId = playerUniqueId;
+    public void updateTotpToken(String totpToken) {
+        this.totpToken = totpToken;
     }
 
     @Override

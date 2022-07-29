@@ -5,8 +5,6 @@ public interface AuthenticMainConfig {
     long authorizeTime();
 
     String licenseCheckUrl();
-    String confirmKeyword();
 
     boolean licensedAutologin();
-    boolean registerNeedRepeatPassword();
 }

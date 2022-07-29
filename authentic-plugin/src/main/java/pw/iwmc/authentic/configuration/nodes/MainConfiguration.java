@@ -5,9 +5,6 @@ import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import pw.iwmc.authentic.api.configuration.nodes.AuthenticMainConfig;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @ConfigSerializable
 public class MainConfiguration implements AuthenticMainConfig {
 
@@ -20,14 +17,8 @@ public class MainConfiguration implements AuthenticMainConfig {
     @Setting("license-check-url")
     protected String licenseCheckUrl = "https://api.mojang.com/users/profiles/minecraft/%s";
 
-    @Setting("confirm-keyword")
-    protected String confirmKeyword = "confirm";
-
     @Setting("licensed-autologin")
     protected boolean licensedAutologin = true;
-
-    @Setting("register-need-repeat-password")
-    protected boolean registerNeedRepeatPassword = true;
 
     @Override
     public long sessionTime() {
@@ -45,17 +36,7 @@ public class MainConfiguration implements AuthenticMainConfig {
     }
 
     @Override
-    public String confirmKeyword() {
-        return confirmKeyword;
-    }
-
-    @Override
     public boolean licensedAutologin() {
         return licensedAutologin;
-    }
-
-    @Override
-    public boolean registerNeedRepeatPassword() {
-        return registerNeedRepeatPassword;
     }
 }

@@ -10,8 +10,6 @@ import pw.iwmc.authentic.api.configuration.nodes.AuthenticMessagesConfig;
 
 import pw.iwmc.authentic.configuration.nodes.value.PluginTitleValues;
 
-import java.util.concurrent.TimeUnit;
-
 @ConfigSerializable
 public class MessagesConfiguration implements AuthenticMessagesConfig {
 
@@ -53,14 +51,9 @@ public class MessagesConfiguration implements AuthenticMessagesConfig {
     @Setting("license-logged-title-settings")
     protected PluginTitleValues licenseLoggedTitleSettings = new PluginTitleValues();
 
-    @Setting("messages-delay-unit")
-    protected TimeUnit messageDelayTimeUnit = TimeUnit.MILLISECONDS;
-
-    @Setting("license-messages-delay")
-    protected long licenseMessagesDelay = 0;
-
-    @Setting("floodgate-messages-delay")
-    protected long floodgateMessagesDelay = 0;
+    @NodeKey
+    @Setting("totp-title-settings")
+    protected PluginTitleValues totpTitleSettings = new PluginTitleValues();
 
     @Override
     public boolean cyclicMessagesEnabled() {
@@ -118,17 +111,7 @@ public class MessagesConfiguration implements AuthenticMessagesConfig {
     }
 
     @Override
-    public TimeUnit messageDelayTimeUnit() {
-        return messageDelayTimeUnit;
-    }
-
-    @Override
-    public long licenseMessagesDelay() {
-        return licenseMessagesDelay;
-    }
-
-    @Override
-    public long floodgateMessagesDelay() {
-        return floodgateMessagesDelay;
+    public PluginTitleValues totpTitleSettings() {
+        return totpTitleSettings;
     }
 }

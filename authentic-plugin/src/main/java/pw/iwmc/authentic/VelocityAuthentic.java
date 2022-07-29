@@ -25,10 +25,12 @@ import pw.iwmc.authentic.api.Authentic;
 import pw.iwmc.authentic.configuration.PluginConfiguration;
 import pw.iwmc.authentic.floodgate.FloodgateHolder;
 import pw.iwmc.authentic.limbo.PluginLimbo;
+import pw.iwmc.authentic.limbo.commands.LimboCommands;
 import pw.iwmc.authentic.managers.PluginAccountManager;
 import pw.iwmc.authentic.commands.manager.PluginCommandsManager;
 import pw.iwmc.authentic.managers.PluginLicenseManager;
 import pw.iwmc.authentic.managers.PluginStorageManager;
+import pw.iwmc.authentic.managers.PluginTotpManager;
 import pw.iwmc.authentic.messages.MessageKeys;
 
 import pw.iwmc.libman.api.LibmanAPI;
@@ -50,12 +52,14 @@ public class VelocityAuthentic implements Authentic {
 
     private FloodgateHolder floodgateHolder;
     private PluginLimbo limbo;
+    private LimboCommands limboCommands;
 
     private PluginConfiguration configuration;
     private PluginAccountManager accountManager;
     private PluginLicenseManager licenseManager;
     private PluginStorageManager storageManager;
     private PluginCommandsManager commandsManager;
+    private PluginTotpManager totpManager;
 
     private AbstractMessages<Player> messages;
     private PasswordEncryptor passwordEncryptor;
@@ -74,7 +78,7 @@ public class VelocityAuthentic implements Authentic {
     public void onProxyInit(ProxyInitializeEvent event) {
         defaultLogger.info("Loading plugin...");
 
-        injectDependencies();
+        loadAllDependencies();
 
         loadConfiguration();
         loadMessages();
@@ -92,7 +96,9 @@ public class VelocityAuthentic implements Authentic {
             this.floodgateHolder = new FloodgateHolder();
         }
 
+        this.totpManager = new PluginTotpManager();
         this.commandsManager = new PluginCommandsManager();
+        this.limboCommands = new LimboCommands();
 
         var eventManager = proxyServer.getEventManager();
         eventManager.register(this, new PluginListeners());
@@ -121,6 +127,14 @@ public class VelocityAuthentic implements Authentic {
 
     public PluginLimbo limbo() {
         return limbo;
+    }
+
+    public LimboCommands limboCommands() {
+        return limboCommands;
+    }
+
+    public PluginTotpManager totpManager() {
+        return totpManager;
     }
 
     public List<String> unsafePasswords() {
@@ -180,7 +194,7 @@ public class VelocityAuthentic implements Authentic {
         }
     }
 
-    private void injectDependencies() {
+    private void loadAllDependencies() {
         try {
             var libman = LibmanAPI.libman();
             var downloaded = libman.downloaded();
@@ -188,14 +202,24 @@ public class VelocityAuthentic implements Authentic {
             var liteCommandsCore = Dependency.of("dev.rollczi.litecommands:core:2.4.1");
             var liteCommandsVelocity = Dependency.of("dev.rollczi.litecommands:velocity:2.4.1");
             var expressible = Dependency.of("org.panda-lang:expressible:1.1.20");
+            var totp = Dependency.of("dev.samstevens.totp:totp:1.7.1");
+            var zxing = Dependency.of("com.google.zxing:core:3.5.0");
+            var zxingSE = Dependency.of("com.google.zxing:javase:3.5.0");
+            var commonsCodec = Dependency.of("commons-codec:commons-codec:1.15");
 
             var pandaRepo = Repository.of("panda-repo", "https://repo.panda-lang.org/releases/");
 
-            defaultLogger.info("Download plugin dependencies...");
+            defaultLogger.info("Loading plugin dependencies...");
             var downloader = libman.downloader();
+
             downloader.downloadDependencyFromRepo(liteCommandsVelocity, pandaRepo);
             downloader.downloadDependencyFromRepo(liteCommandsCore, pandaRepo);
             downloader.downloadDependencyFromRepo(expressible, pandaRepo);
+
+            downloader.downloadDependency(totp);
+            downloader.downloadDependency(zxing);
+            downloader.downloadDependency(zxingSE);
+            downloader.downloadDependency(commonsCodec);
 
             defaultLogger.info("Injecting " + downloaded.size() + " dependencies...");
             downloaded.forEach((key, value) -> proxyServer.getPluginManager().addToClasspath(this, value));

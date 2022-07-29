@@ -10,9 +10,6 @@ public class TotpConfiguration implements AuthenticTotpConfig {
     @Setting("totp-enabled")
     protected boolean totpEnabled = true;
 
-    @Setting("totp-need-password")
-    protected boolean totpNeedPassword = true;
-
     @Setting("totp-issuser")
     protected String totpIssuser = "Authentic by Icewynd";
 
@@ -20,16 +17,11 @@ public class TotpConfiguration implements AuthenticTotpConfig {
     protected String totpQrGenerator = "https://api.qrserver.com/v1/create-qr-code/?data={data}&size=200x200&ecc=M&margin=30";
 
     @Setting("totp-recovery-codes-amount")
-    protected long totpRecoveryCodesAmount = 16;
+    protected int totpRecoveryCodesAmount = 16;
 
     @Override
     public boolean totpEnabled() {
         return totpEnabled;
-    }
-
-    @Override
-    public boolean totpNeedPassword() {
-        return totpNeedPassword;
     }
 
     @Override
@@ -43,7 +35,7 @@ public class TotpConfiguration implements AuthenticTotpConfig {
     }
 
     @Override
-    public long totpRecoveryCodesAmount() {
+    public int totpRecoveryCodesAmount() {
         return totpRecoveryCodesAmount;
     }
 }

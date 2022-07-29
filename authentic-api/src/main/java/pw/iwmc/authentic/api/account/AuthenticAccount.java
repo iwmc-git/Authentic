@@ -12,6 +12,7 @@ public interface AuthenticAccount {
     InetAddress lastConnectedAddress();
     Timestamp lastConnectedDate();
 
+    Optional<String> totpToken();
     Optional<UUID> playerLicenseId();
     Optional<String> hashedPassword();
     Optional<InetAddress> lastLoggedAddress();
@@ -21,12 +22,17 @@ public interface AuthenticAccount {
     boolean registered();
     boolean logged();
 
+    boolean passedLogin();
+    void passLogin(boolean pass);
+
+    boolean hasTotp();
+
     void updateHashedPassword(String hashedPassword);
     void updateLicenseId(UUID playerLicenseId);
     void updateLastLoggedAddress(InetAddress lastLoggedAddress);
     void updateSessionEndDate(Timestamp sessionEndDate);
 
-    void updateUniqueId(UUID playerUniqueId);
+    void updateTotpToken(String totpToken);
 
     void updateLastConnectedAddress(InetAddress lastConnectedAddress);
     void updateLastConnectedDate(Timestamp lastConnectedDate);

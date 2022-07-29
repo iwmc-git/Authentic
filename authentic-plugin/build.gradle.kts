@@ -27,6 +27,7 @@ dependencies {
     // other
     compileOnly("org.geysermc.floodgate:api:2.1.1-SNAPSHOT")
     compileOnly("net.elytrium:limboapi-api:1.0.6-SNAPSHOT")
+    compileOnly("dev.samstevens.totp:totp:1.7.1")
 
     compileOnly("dev.rollczi.litecommands:velocity:2.4.1")
     compileOnly("dev.rollczi.litecommands:core:2.4.1")

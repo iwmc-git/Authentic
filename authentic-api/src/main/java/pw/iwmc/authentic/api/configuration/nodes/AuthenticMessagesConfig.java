@@ -23,9 +23,5 @@ public interface AuthenticMessagesConfig {
     AuthenticTitleValues registeredTitleSettings();
 
     AuthenticTitleValues licenseLoggedTitleSettings();
-
-    TimeUnit messageDelayTimeUnit();
-
-    long licenseMessagesDelay();
-    long floodgateMessagesDelay();
+    AuthenticTitleValues totpTitleSettings();
 }

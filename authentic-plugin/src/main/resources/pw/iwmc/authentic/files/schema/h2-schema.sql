@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS `authentic_data` (
     `playerUniqueId`    VARCHAR(255)    NOT NULL,
     `playerName`        VARCHAR(255)    NOT NULL,
 
+    `totpToken`         VARCHAR(255)    DEFAULT NULL,
+
     `hashedPassword`    VARCHAR(255)    DEFAULT NULL,
     `licenseId`         VARCHAR(255)    DEFAULT NULL,
 
@@ -17,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `authentic_data` (
 
 -- #updateAccount
 -- Updates account in database.
-UPDATE `authentic_data` SET `playerUniqueId` = ?, `playerName` = ?, `hashedPassword` = ?, `licenseId` = ?, `lastLoggedAddress` = ?, `sessionEndDate` = ? WHERE playerName = ?;
+UPDATE `authentic_data` SET `playerUniqueId` = ?, `playerName` = ?, `totpToken` = ?, `hashedPassword` = ?, `licenseId` = ?, `lastLoggedAddress` = ?, `sessionEndDate` = ? WHERE playerName = ?;
 
 -- #mapIntoCache
 -- Add all accounts into cache.
@@ -37,12 +39,14 @@ INSERT INTO `authentic_data` (
     playerUniqueId,
     playerName,
 
+    totpToken,
+
     hashedPassword,
     licenseId,
 
     lastLoggedAddress,
     sessionEndDate
-) VALUES (?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?);
 
 -- #dropAccount
 -- Removes account from database.

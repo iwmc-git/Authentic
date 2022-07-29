@@ -62,15 +62,18 @@ public class PluginStorageManager implements AuthenticStorageManager {
                 var uniqueId = UUID.fromString(resultSet.getString(1));
                 var playerName = resultSet.getString(2);
 
-                var hashedPassword = resultSet.getString(3);
-                var licenseId = resultSet.getString(4);
+                var totpToken = resultSet.getString(3);
 
-                var lastLoggedAddress = resultSet.getString(5);
-                var endSessionDate = resultSet.getTimestamp(6);
+                var hashedPassword = resultSet.getString(4);
+                var licenseId = resultSet.getString(5);
+
+                var lastLoggedAddress = resultSet.getString(6);
+                var endSessionDate = resultSet.getTimestamp(7);
 
                 var account = new PluginAccount(playerName, uniqueId);
                 account.updateHashedPassword(hashedPassword);
                 account.updateSessionEndDate(endSessionDate);
+                account.updateTotpToken(totpToken);
 
                 if (licenseId != null) {
                     account.updateLicenseId(UUID.fromString(licenseId));
@@ -95,15 +98,18 @@ public class PluginStorageManager implements AuthenticStorageManager {
                 var uniqueId = UUID.fromString(resultSet.getString(1));
                 var playerName = resultSet.getString(2);
 
-                var hashedPassword = resultSet.getString(3);
-                var licenseId = resultSet.getString(4);
+                var totpToken = resultSet.getString(3);
 
-                var lastLoggedAddress = resultSet.getString(5);
-                var endSessionDate = resultSet.getTimestamp(6);
+                var hashedPassword = resultSet.getString(4);
+                var licenseId = resultSet.getString(5);
+
+                var lastLoggedAddress = resultSet.getString(6);
+                var endSessionDate = resultSet.getTimestamp(7);
 
                 var account = new PluginAccount(playerName, uniqueId);
                 account.updateHashedPassword(hashedPassword);
                 account.updateSessionEndDate(endSessionDate);
+                account.updateTotpToken(totpToken);
 
                 if (licenseId != null) {
                     account.updateLicenseId(UUID.fromString(licenseId));
@@ -135,32 +141,39 @@ public class PluginStorageManager implements AuthenticStorageManager {
             preparedStatement.setString(2, account.playerName());
 
             try {
-                var hashedPassword = account.hashedPassword();
-                if (hashedPassword != null && hashedPassword.isPresent()) {
-                    preparedStatement.setString(3, hashedPassword.get());
+                var totpToken = account.hashedPassword();
+                if (totpToken != null && totpToken.isPresent()) {
+                    preparedStatement.setString(3, totpToken.get());
                 } else {
                     preparedStatement.setString(3, null);
                 }
 
-                var playerLicenseId = account.playerLicenseId();
-                if (playerLicenseId != null && playerLicenseId.isPresent()) {
-                    preparedStatement.setString(4, playerLicenseId.get().toString());
+                var hashedPassword = account.hashedPassword();
+                if (hashedPassword != null && hashedPassword.isPresent()) {
+                    preparedStatement.setString(4, hashedPassword.get());
                 } else {
                     preparedStatement.setString(4, null);
                 }
 
-                var lastLoggedAddress = account.lastLoggedAddress();
-                if (lastLoggedAddress != null && lastLoggedAddress.isPresent()) {
-                    preparedStatement.setString(5, lastLoggedAddress.get().getHostAddress());
+                var playerLicenseId = account.playerLicenseId();
+                if (playerLicenseId != null && playerLicenseId.isPresent()) {
+                    preparedStatement.setString(5, playerLicenseId.get().toString());
                 } else {
                     preparedStatement.setString(5, null);
                 }
 
-                var sessionEndDate = account.sessionEndDate();
-                if (sessionEndDate != null && sessionEndDate.isPresent()) {
-                    preparedStatement.setTimestamp(6, sessionEndDate.get());
+                var lastLoggedAddress = account.lastLoggedAddress();
+                if (lastLoggedAddress != null && lastLoggedAddress.isPresent()) {
+                    preparedStatement.setString(6, lastLoggedAddress.get().getHostAddress());
                 } else {
                     preparedStatement.setString(6, null);
+                }
+
+                var sessionEndDate = account.sessionEndDate();
+                if (sessionEndDate != null && sessionEndDate.isPresent()) {
+                    preparedStatement.setTimestamp(7, sessionEndDate.get());
+                } else {
+                    preparedStatement.setString(7, null);
                 }
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
@@ -183,35 +196,42 @@ public class PluginStorageManager implements AuthenticStorageManager {
             preparedStatement.setString(1, account.playerUniqueId().toString());
             preparedStatement.setString(2, account.playerName());
 
-            preparedStatement.setString(7, account.playerName());
+            preparedStatement.setString(8, account.playerName());
 
             try {
-                var hashedPassword = account.hashedPassword();
-                if (hashedPassword != null && hashedPassword.isPresent()) {
-                    preparedStatement.setString(3, hashedPassword.get());
+                var totpToken = account.totpToken();
+                if (totpToken != null && totpToken.isPresent()) {
+                    preparedStatement.setString(3, totpToken.get());
                 } else {
                     preparedStatement.setString(3, null);
                 }
 
-                var playerLicenseId = account.playerLicenseId();
-                if (playerLicenseId != null && playerLicenseId.isPresent()) {
-                    preparedStatement.setString(4, playerLicenseId.get().toString());
+                var hashedPassword = account.hashedPassword();
+                if (hashedPassword != null && hashedPassword.isPresent()) {
+                    preparedStatement.setString(4, hashedPassword.get());
                 } else {
                     preparedStatement.setString(4, null);
                 }
 
-                var lastLoggedAddress = account.lastLoggedAddress();
-                if (lastLoggedAddress != null && lastLoggedAddress.isPresent()) {
-                    preparedStatement.setString(5, lastLoggedAddress.get().getHostAddress());
+                var playerLicenseId = account.playerLicenseId();
+                if (playerLicenseId != null && playerLicenseId.isPresent()) {
+                    preparedStatement.setString(5, playerLicenseId.get().toString());
                 } else {
                     preparedStatement.setString(5, null);
                 }
 
-                var sessionEndDate = account.sessionEndDate();
-                if (sessionEndDate != null && sessionEndDate.isPresent()) {
-                    preparedStatement.setTimestamp(6, sessionEndDate.get());
+                var lastLoggedAddress = account.lastLoggedAddress();
+                if (lastLoggedAddress != null && lastLoggedAddress.isPresent()) {
+                    preparedStatement.setString(6, lastLoggedAddress.get().getHostAddress());
                 } else {
                     preparedStatement.setString(6, null);
+                }
+
+                var sessionEndDate = account.sessionEndDate();
+                if (sessionEndDate != null && sessionEndDate.isPresent()) {
+                    preparedStatement.setTimestamp(7, sessionEndDate.get());
+                } else {
+                    preparedStatement.setString(7, null);
                 }
             } catch (Exception exception) {
                 throw new RuntimeException(exception);
@@ -259,16 +279,19 @@ public class PluginStorageManager implements AuthenticStorageManager {
 
                     var account = new PluginAccount(name, uniqueId);
 
-                    var hashedPassword = resultSet.getString(3);
+                    var totpToken = resultSet.getString(3);
+                    account.updateTotpToken(totpToken);
+
+                    var hashedPassword = resultSet.getString(4);
                     account.updateHashedPassword(hashedPassword);
 
-                    var licenseId = resultSet.getString(4);
+                    var licenseId = resultSet.getString(5);
                     account.updateLicenseId(licenseId != null ? UUID.fromString(licenseId) : null);
 
-                    var lastLoggedAddress = resultSet.getString(5);
+                    var lastLoggedAddress = resultSet.getString(6);
                     account.updateLastLoggedAddress(lastLoggedAddress != null ? InetAddress.getByName(lastLoggedAddress) : null);
 
-                    var sessionEndTime = resultSet.getTimestamp(6);
+                    var sessionEndTime = resultSet.getTimestamp(7);
                     account.updateSessionEndDate(sessionEndTime);
 
                     authentic.accountManager().addAccount(account);

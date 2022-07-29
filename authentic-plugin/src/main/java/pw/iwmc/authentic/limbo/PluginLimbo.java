@@ -8,6 +8,7 @@ import net.elytrium.limboapi.api.LimboFactory;
 import net.elytrium.limboapi.api.LimboSessionHandler;
 import net.elytrium.limboapi.api.chunk.Dimension;
 import net.elytrium.limboapi.api.chunk.VirtualWorld;
+import net.elytrium.limboapi.api.command.LimboCommandMeta;
 import net.elytrium.limboapi.api.player.GameMode;
 
 import pw.iwmc.authentic.VelocityAuthentic;
@@ -32,6 +33,16 @@ public class PluginLimbo {
                 .setName("Authentic")
                 .setWorldTime(limboConfig.worldTics())
                 .setGameMode(GameMode.CREATIVE);
+
+        var commandManager = authentic.proxyServer().getCommandManager();
+
+        var loginCommandMeta = commandManager.metaBuilder("login").aliases("l").build();
+        var registerCommandMeta = commandManager.metaBuilder("register").aliases("reg").build();
+        var totpCommandMeta = commandManager.metaBuilder("totp").aliases("2fa", "2factor").build();
+
+        limbo.registerCommand(new LimboCommandMeta(loginCommandMeta.getAliases()));
+        limbo.registerCommand(new LimboCommandMeta(registerCommandMeta.getAliases()));
+        limbo.registerCommand(new LimboCommandMeta(totpCommandMeta.getAliases()));
     }
 
     public void spawnInLimbo(Player player, LimboSessionHandler handler) {

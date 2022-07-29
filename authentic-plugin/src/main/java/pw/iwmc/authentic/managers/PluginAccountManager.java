@@ -2,6 +2,8 @@ package pw.iwmc.authentic.managers;
 
 import com.velocitypowered.api.proxy.Player;
 
+import net.elytrium.limboapi.api.LimboSessionHandler;
+import net.elytrium.limboapi.api.player.LimboPlayer;
 import noelle.features.messages.common.AbstractMessages;
 
 import pw.iwmc.authentic.VelocityAuthentic;
@@ -31,6 +33,8 @@ public class PluginAccountManager implements AuthenticAccountManager {
     private final ConcurrentMap<String, Runnable> postLoginTasks;
     private final ConcurrentMap<String, Runnable> postRegisterTasks;
 
+    private final ConcurrentMap<String, LimboPlayer> limboPlayers;
+
     public PluginAccountManager() {
         authentic.defaultLogger().info("Loading account manager...");
 
@@ -39,6 +43,8 @@ public class PluginAccountManager implements AuthenticAccountManager {
 
         this.postLoginTasks = new ConcurrentHashMap<>();
         this.postRegisterTasks = new ConcurrentHashMap<>();
+
+        this.limboPlayers = new ConcurrentHashMap<>();
 
         authentic.defaultLogger().info("All cached maps are loaded!");
     }
@@ -60,6 +66,10 @@ public class PluginAccountManager implements AuthenticAccountManager {
 
     public ConcurrentMap<String, Runnable> postRegisterTasks() {
         return postRegisterTasks;
+    }
+
+    public ConcurrentMap<String, LimboPlayer> limboPlayers() {
+        return limboPlayers;
     }
 
     @Override
