@@ -6,5 +6,6 @@ public interface AuthenticMainConfig {
 
     String licenseCheckUrl();
 
+    boolean debug();
     boolean licensedAutologin();
 }

@@ -23,6 +23,8 @@ public class RegisterCommand {
     private final AbstractMessages<Player> messages = authentic.messages();
 
     public void execute(Player player, String[] arguments) {
+        authentic.debug("Executing register command for " + player.getUsername());
+
         var messagesConfig = configuration.messagesConfiguration();
         var securityConfig = configuration.securityConfiguration();
         var mainConfig = configuration.mainConfiguration();
@@ -71,7 +73,7 @@ public class RegisterCommand {
             player.sendMessage(message);
         }
 
-        authentic.defaultLogger().info("Handling account register for " + account.playerName() + "...");
+        authentic.debug("Handling account register for " + account.playerName() + "...");
         var hashedPassword = authentic.passwordEncryptor().encode(startPassword);
 
         var endSessionTime = new Timestamp(System.currentTimeMillis() + (mainConfig.sessionTime() * 60000));

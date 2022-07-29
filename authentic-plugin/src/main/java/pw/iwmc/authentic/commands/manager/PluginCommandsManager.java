@@ -9,10 +9,12 @@ import pw.iwmc.authentic.VelocityAuthentic;
 import pw.iwmc.authentic.commands.*;
 
 public class PluginCommandsManager {
-    private final VelocityAuthentic authentic = VelocityAuthentic.authentic();
     private final LiteCommands<CommandSource> liteCommands;
 
     public PluginCommandsManager() {
+        var authentic = VelocityAuthentic.authentic();
+        authentic.defaultLogger().info("Registrering in-game commands...");
+
         this.liteCommands = LiteVelocityFactory.builder(authentic.proxyServer())
                 .command(ChangePasswordCommand.class)
                 .command(UnregisterCommand.class)

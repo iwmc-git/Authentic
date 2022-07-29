@@ -93,6 +93,7 @@ public class VelocityAuthentic implements Authentic {
         this.passwordEncryptor = applyEncryptor();
 
         if (proxyServer.getPluginManager().getPlugin("floodgate").isPresent()) {
+            defaultLogger.info("Floodgate plugin detected! Hooking into...");
             this.floodgateHolder = new FloodgateHolder();
         }
 
@@ -271,6 +272,14 @@ public class VelocityAuthentic implements Authentic {
             }
         } catch (Exception exception) {
             throw new RuntimeException(exception);
+        }
+    }
+
+    public void debug(String message) {
+        var debugEnabled = configuration.mainConfiguration().debug();
+
+        if (debugEnabled) {
+            debuggerLogger.info(message);
         }
     }
 

@@ -22,6 +22,8 @@ public class TotpCommand {
     private final AbstractMessages<Player> messages = authentic.messages();
 
     public void execute(Player player, String[] arguments) {
+        authentic.debug("Executing totp command for " + player.getUsername());
+
         var accountOptional = accountManager.accountByName(player.getUsername());
         var limboPlayer = accountManager.limboPlayers().get(player.getUsername());
 
@@ -54,10 +56,13 @@ public class TotpCommand {
         var token = account.totpToken().get();
         var totpKey = arguments[1];
 
+        authentic.debug("Handling account totp verify for " + account.playerName() + "...");
+
         if (!totpManager.codeVerifier().isValidCode(token, totpKey)) {
             var message = messages.message(MessageKeys.TOTP_LIMBO_WRONG);
             player.sendMessage(message);
         } else {
+
             var mainConfig = configuration.mainConfiguration();
 
             var endSessionTime = new Timestamp(System.currentTimeMillis() + (mainConfig.sessionTime() * 60000));

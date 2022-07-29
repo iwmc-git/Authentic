@@ -20,16 +20,14 @@ public class PluginLimbo {
     private final Limbo limbo;
 
     public PluginLimbo() {
+        authentic.defaultLogger().info("Creating limbo server...");
+
         var limboConfig = authentic.configuration().limboConfiguration();
         var proxyServer = authentic.proxyServer();
         var pluginManager = proxyServer.getPluginManager();
 
         this.limboFactory = (LimboFactory) pluginManager.getPlugin("limboapi").flatMap(PluginContainer::getInstance).orElseThrow();
-
-        var world = makeWorld();
-
-        authentic.defaultLogger().info("Creating limbo server...");
-        this.limbo = limboFactory.createLimbo(world)
+        this.limbo = limboFactory.createLimbo(makeWorld())
                 .setName("Authentic")
                 .setWorldTime(limboConfig.worldTics())
                 .setGameMode(GameMode.CREATIVE);
@@ -40,13 +38,14 @@ public class PluginLimbo {
         var registerCommandMeta = commandManager.metaBuilder("register").aliases("reg").build();
         var totpCommandMeta = commandManager.metaBuilder("totp").aliases("2fa", "2factor").build();
 
+        authentic.defaultLogger().info("Registering in-limbo command meta...");
         limbo.registerCommand(new LimboCommandMeta(loginCommandMeta.getAliases()));
         limbo.registerCommand(new LimboCommandMeta(registerCommandMeta.getAliases()));
         limbo.registerCommand(new LimboCommandMeta(totpCommandMeta.getAliases()));
     }
 
     public void spawnInLimbo(Player player, LimboSessionHandler handler) {
-        authentic.defaultLogger().info("Spawning " + player.getUsername() + " into lobby..");
+        authentic.debug("Spawning " + player.getUsername() + " into lobby..");
         limbo.spawnPlayer(player, handler);
     }
 

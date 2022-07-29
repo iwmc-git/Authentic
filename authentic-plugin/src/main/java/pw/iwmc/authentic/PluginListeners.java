@@ -30,6 +30,8 @@ public class PluginListeners {
 
     @Subscribe(order = PostOrder.FIRST)
     public void onPreLogin(PreLoginEvent event) {
+        authentic.debug("Executing `onPreLogin` for " + event.getUsername());
+
         var accountOptional = accountManager.accountByName(event.getUsername());
         var autoLogin = configuration.mainConfiguration().licensedAutologin();
 
@@ -38,6 +40,8 @@ public class PluginListeners {
         }
 
         if (autoLogin) {
+            authentic.debug("Autogin enabled! Continue..");
+
             var account = accountOptional.get();
             var haveLicense = account.licensed();
 
@@ -67,12 +71,15 @@ public class PluginListeners {
 
             event.setResult(result);
         }
+
+        authentic.debug("Event `onPreLogin` executed for " + event.getUsername());
     }
 
     @Subscribe(order = PostOrder.FIRST)
     public void onGameProfileRequest(GameProfileRequestEvent event) {
-        var accountOptional = accountManager.accountByName(event.getUsername());
+        authentic.debug("Executing `onGameProfileRequest` for " + event.getUsername());
 
+        var accountOptional = accountManager.accountByName(event.getUsername());
         if (accountOptional.isEmpty()) {
             return;
         }
@@ -83,13 +90,16 @@ public class PluginListeners {
 
         var newGameProfile = gameProfile.withId(playerId);
         event.setGameProfile(newGameProfile);
+
+        authentic.debug("Event `onGameProfileRequest` executed for " + event.getUsername());
     }
 
     @Subscribe(order = PostOrder.LAST)
     public void onPostLogin(PostLoginEvent event) {
+        authentic.debug("Executing `onPostLogin` for " + event.getPlayer().getUsername());
+
         var postLoginTasks = accountManager.postLoginTasks();
         var postRegisterTasks = accountManager.postRegisterTasks();
-        var autoLogin = configuration.mainConfiguration().licensedAutologin();
 
         var messagesConfig = configuration.messagesConfiguration();
         var messages = authentic.messages();
@@ -162,11 +172,15 @@ public class PluginListeners {
                 }
             }
         }).delay(2, TimeUnit.SECONDS).schedule();
+
+        authentic.debug("Event `onPostLogin` executed for " + event.getPlayer().getUsername());
     }
 
     // WORK!!!!!
     @Subscribe()
     public void onPreLimboLogin(LoginLimboRegisterEvent event) {
+        authentic.debug("Executing `onPreLimboLogin` for " + event.getPlayer().getUsername());
+
         var cached = accountManager.accountByName(event.getPlayer().getUsername());
         if (cached.isEmpty()) {
             var username = event.getPlayer().getUsername();
@@ -183,10 +197,14 @@ public class PluginListeners {
             accountManager.addAccount(account);
             storageManager.insertAccount(account);
         }
+
+        authentic.debug("Event `onPreLimboLogin` executed for " + event.getPlayer().getUsername());
     }
 
     @Subscribe(order = PostOrder.LATE)
     public void onLimboLogin(LoginLimboRegisterEvent event) {
+        authentic.debug("Executing `onLimboLogin` for " + event.getPlayer().getUsername());
+
         var cached = accountManager.accountByName(event.getPlayer().getUsername());
         var autoLogin = configuration.mainConfiguration().licensedAutologin();
 
@@ -207,14 +225,16 @@ public class PluginListeners {
                 }
             }
         }
+
+        authentic.defaultLogger().info("Event `onLimboLogin` executed for " + event.getPlayer().getUsername());
     }
 
     // ?
     @Subscribe(order = PostOrder.LAST)
     public void onLimboPostLogin(LoginLimboRegisterEvent event) {
-        var cached = accountManager.accountByName(event.getPlayer().getUsername());
-        var mainConfig = configuration.mainConfiguration();
+        authentic.debug("Executing `onLimboPostLogin` for " + event.getPlayer().getUsername());
 
+        var cached = accountManager.accountByName(event.getPlayer().getUsername());
         if (cached.isPresent()) {
             var account = cached.get();
 
@@ -232,5 +252,7 @@ public class PluginListeners {
                 event.addOnJoinCallback(() -> accountManager.authorize(event.getPlayer(), account));
             }
         }
+
+        authentic.debug("Event `onLimboPostLogin` executed for " + event.getPlayer().getUsername());
     }
 }

@@ -56,6 +56,8 @@ public class PluginStorageManager implements AuthenticStorageManager {
 
     @Override
     public Optional<AuthenticAccount> accountByName(String name) {
+        authentic.debug("Finding account with name " + name + " in storage...");
+
         var query = sqlFileReader.query("accountByName");
         return query.flatMap(sqlQuery -> connection.query(String.format(sqlQuery.query(), name)).first(resultSet -> {
             try {
@@ -92,6 +94,8 @@ public class PluginStorageManager implements AuthenticStorageManager {
 
     @Override
     public Optional<AuthenticAccount> accountById(UUID id) {
+        authentic.debug("Finding account with id " + id + " in storage...");
+
         var query = sqlFileReader.query("accountByUniqueId");
         return query.flatMap(sqlQuery -> connection.query(String.format(sqlQuery.query(), id)).first(resultSet -> {
             try {
@@ -133,7 +137,7 @@ public class PluginStorageManager implements AuthenticStorageManager {
             return;
         }
 
-        authentic.defaultLogger().info("Creating account for " + account.playerName() + " in database...");
+        authentic.debug("Creating account for " + account.playerName() + " in database...");
         var query = sqlFileReader.query("makeAccount");
 
         query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
@@ -189,7 +193,7 @@ public class PluginStorageManager implements AuthenticStorageManager {
             return;
         }
 
-        authentic.defaultLogger().info("Updating " + account.playerName() + " account in database...");
+        authentic.debug("Updating " + account.playerName() + " account in database...");
         var query = sqlFileReader.query("updateAccount");
 
         query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {
@@ -241,6 +245,7 @@ public class PluginStorageManager implements AuthenticStorageManager {
 
     @Override
     public void dropAccount(AuthenticAccount account) {
+        authentic.debug("Deleting account with name " + account.playerName() + " from database...");
         var query = sqlFileReader.query("dropAccount");
 
         query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query())
@@ -261,12 +266,12 @@ public class PluginStorageManager implements AuthenticStorageManager {
     }
 
     private void makeTable() {
-        authentic.defaultLogger().info("Creating new table...");
+        authentic.debug("Creating new table...");
         sqlFileReader.query("makeTable").ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).execute());
     }
 
     private void mapInCache() {
-        authentic.defaultLogger().info("Mapping database accounts in cache...");
+        authentic.debug("Mapping database accounts in cache...");
         var query = sqlFileReader.query("mapIntoCache");
 
         query.ifPresent(sqlQuery -> connection.execute(sqlQuery.query()).prepare(preparedStatement -> {

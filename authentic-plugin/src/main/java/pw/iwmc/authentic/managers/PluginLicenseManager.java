@@ -17,6 +17,8 @@ public class PluginLicenseManager implements AuthenticLicenseManager {
 
     @Override
     public UUID retrieveFor(String playerName) {
+        authentic.debug("Retrieving license id for " + playerName);
+
         var cachedLicenses = authentic.accountManager().cachedLicenses();
 
         var mainConfig = authentic.configuration().mainConfiguration();
@@ -24,9 +26,11 @@ public class PluginLicenseManager implements AuthenticLicenseManager {
 
         var cachedLicense = cachedLicenses.get(playerName);
         if (cachedLicense != null) {
+            authentic.debug("License id for " + playerName + " found in cache!");
             return cachedLicense;
         }
 
+        authentic.debug("License id for " + playerName + " not found in cache! Checking in external...");
         try (var stream = new URL(url).openStream()) {
             var jsonObject = gson.fromJson(new InputStreamReader(stream), JsonObject.class);
 
@@ -34,6 +38,7 @@ public class PluginLicenseManager implements AuthenticLicenseManager {
             var name = jsonObject.get("name").getAsString();
 
             if (id == null || id.isBlank() || id.isEmpty()) {
+                authentic.debug("License id for " + playerName + " not found in external!");
                 return null;
             }
 
@@ -42,6 +47,7 @@ public class PluginLicenseManager implements AuthenticLicenseManager {
                     new BigInteger(id.substring(16, 32), 16).longValue()
             );
 
+            authentic.debug("Adding license id " + playerName + " into cache!");
             cachedLicenses.putIfAbsent(name, performedUuid);
 
             return performedUuid;

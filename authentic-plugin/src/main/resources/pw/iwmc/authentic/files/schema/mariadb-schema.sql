@@ -6,15 +6,20 @@ CREATE TABLE IF NOT EXISTS `authentic_data` (
     `playerUniqueId`    VARCHAR(255)    NOT NULL,
     `playerName`        VARCHAR(255)    NOT NULL,
 
+    `totpToken`         VARCHAR(255)    DEFAULT NULL,
+
     `hashedPassword`    VARCHAR(255)    DEFAULT NULL,
     `licenseId`         VARCHAR(255)    DEFAULT NULL,
 
     `lastLoggedAddress` VARCHAR(255)    NULL            DEFAULT NULL,
     `sessionEndDate`    TIMESTAMP       NULL            DEFAULT NULL,
 
-    PRIMARY KEY (`playerUniqueId`),
-    UNIQUE (`playerName`, `licenseId`)
+    PRIMARY KEY (`playerUniqueId`)
 );
+
+-- #updateAccount
+-- Updates account in database.
+UPDATE `authentic_data` SET `playerUniqueId` = ?, `playerName` = ?, `totpToken` = ?, `hashedPassword` = ?, `licenseId` = ?, `lastLoggedAddress` = ?, `sessionEndDate` = ? WHERE playerName = ?;
 
 -- #mapIntoCache
 -- Add all accounts into cache.
@@ -34,17 +39,15 @@ INSERT INTO `authentic_data` (
     playerUniqueId,
     playerName,
 
+    totpToken,
+
     hashedPassword,
     licenseId,
 
     lastLoggedAddress,
     sessionEndDate
-) VALUES (?, ?, ?, ?, ?, ?);
+) VALUES (?, ?, ?, ?, ?, ?, ?);
 
 -- #dropAccount
 -- Removes account from database.
 DELETE FROM `authentic_data` WHERE `playerUniqueId` = ?;
-
--- #updateAccount
--- Updates account in database.
-REPLACE INTO `authentic_data` VALUES (?, ?, ?, ?, ?, ?);

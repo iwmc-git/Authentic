@@ -54,6 +54,8 @@ public class PluginLimboHandler implements LimboSessionHandler {
 
     @Override
     public void onSpawn(Limbo server, LimboPlayer limboPlayer) {
+        authentic.debug("Player " + limboPlayer.getProxyPlayer().getUsername() + " spawned in limbo!");
+
         limboPlayer.disableFalling();
 
         var scheduler = authentic.proxyServer().getScheduler();
@@ -119,6 +121,10 @@ public class PluginLimboHandler implements LimboSessionHandler {
         var chatArgs = chat.split(" ");
 
         if (chatArgs.length == 0) {
+            return;
+        }
+
+        if (chatArgs[0].contains("/")) {
             return;
         }
 

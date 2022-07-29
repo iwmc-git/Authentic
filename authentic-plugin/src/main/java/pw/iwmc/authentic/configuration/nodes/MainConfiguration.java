@@ -20,6 +20,9 @@ public class MainConfiguration implements AuthenticMainConfig {
     @Setting("licensed-autologin")
     protected boolean licensedAutologin = true;
 
+    @Setting("ldebug")
+    protected boolean debug = false;
+
     @Override
     public long sessionTime() {
         return sessionTime;
@@ -33,6 +36,11 @@ public class MainConfiguration implements AuthenticMainConfig {
     @Override
     public String licenseCheckUrl() {
         return licenseCheckUrl;
+    }
+
+    @Override
+    public boolean debug() {
+        return debug;
     }
 
     @Override

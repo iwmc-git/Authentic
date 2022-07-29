@@ -1,8 +1,6 @@
 package pw.iwmc.authentic.managers;
 
 import com.velocitypowered.api.proxy.Player;
-
-import net.elytrium.limboapi.api.LimboSessionHandler;
 import net.elytrium.limboapi.api.player.LimboPlayer;
 import noelle.features.messages.common.AbstractMessages;
 
@@ -74,6 +72,8 @@ public class PluginAccountManager implements AuthenticAccountManager {
 
     @Override
     public Optional<AuthenticAccount> accountByName(String playerName) {
+        authentic.debug("Finding account with name " + playerName + " in cache...");
+
         var accountEntry = cachedAccounts.entrySet()
                 .stream()
                 .filter(entry -> entry.getValue().playerName().equalsIgnoreCase(playerName))
@@ -88,35 +88,36 @@ public class PluginAccountManager implements AuthenticAccountManager {
 
     @Override
     public Optional<AuthenticAccount> accountById(UUID uniqueId) {
+        authentic.debug("Finding account with id " + uniqueId.toString() + " in cache...");
         return Optional.ofNullable(cachedAccounts.get(uniqueId));
     }
 
     @Override
     public void addAccount(AuthenticAccount account) {
-        authentic.defaultLogger().info("Adding " + account.playerName() + "`s account in cache...");
+        authentic.debug("Adding " + account.playerName() + "`s account in cache...");
 
         if (cachedAccounts.get(account.playerUniqueId()) == null) {
-            authentic.defaultLogger().info(account.playerName() + "`s not exists in cache! Adding...");
+            authentic.debug(account.playerName() + "`s not exists in cache! Adding...");
             cachedAccounts.put(account.playerUniqueId(), account);
         }
     }
 
     @Override
     public void removeAccount(AuthenticAccount account) {
-        authentic.defaultLogger().info("Deleting " + account.playerName() + "`s account in cache...");
+        authentic.debug("Deleting " + account.playerName() + "`s account in cache...");
 
         if (cachedAccounts.get(account.playerUniqueId()) != null) {
-            authentic.defaultLogger().info(account.playerName() + "`s exists in cache! Removing...");
+            authentic.debug(account.playerName() + "`s exists in cache! Removing...");
             cachedAccounts.remove(account.playerUniqueId(), account);
         }
     }
 
     @Override
     public void updateAccount(AuthenticAccount account) {
-        authentic.defaultLogger().info("Updating " + account.playerName() + "`s account in cache...");
+        authentic.debug("Updating " + account.playerName() + "`s account in cache...");
 
         if (cachedAccounts.get(account.playerUniqueId()) != null) {
-            authentic.defaultLogger().info(account.playerName() + "`s exists in cache! Removing...");
+            authentic.debug(account.playerName() + "`s exists in cache! Removing...");
             cachedAccounts.remove(account.playerUniqueId(), account);
         }
 

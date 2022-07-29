@@ -22,6 +22,8 @@ public class LoginCommand {
     private final AbstractMessages<Player> messages = authentic.messages();
 
     public void execute(Player player, String[] arguments) {
+        authentic.debug("Executing login command for " + player.getUsername());
+
         var messagesConfig = configuration.messagesConfiguration();
         var mainConfig = configuration.mainConfiguration();
 
@@ -44,12 +46,12 @@ public class LoginCommand {
             return;
         }
 
-        authentic.defaultLogger().info("Handling account login for " + account.playerName() + "...");
-
         var hashedPassword = authentic.passwordEncryptor().encode(arguments[1]);
         var currentPassword = account.hashedPassword();
 
         if (currentPassword.isPresent() && currentPassword.get().equalsIgnoreCase(hashedPassword)) {
+            authentic.debug("Handling account login for " + account.playerName() + "...");
+
             var postLoginTasks = authentic.accountManager().postLoginTasks();
             postLoginTasks.put(player.getUsername(), () -> {
                 var message = messages.message(MessageKeys.LOGIN_SUCCESS_MESSAGE);
