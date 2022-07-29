@@ -59,7 +59,7 @@ public class PluginListeners {
 
             event.setResult(result);
         }
-/*
+
         if (!autoLogin && accountOptional.get().licensed()) {
             var licenseId = accountOptional.get().playerLicenseId();
             var result = licenseId.isPresent()
@@ -67,7 +67,7 @@ public class PluginListeners {
                     : PreLoginEvent.PreLoginComponentResult.forceOfflineMode();
 
             event.setResult(result);
-        }*/
+        }
     }
 
     @Subscribe(order = PostOrder.FIRST)
@@ -123,7 +123,7 @@ public class PluginListeners {
         }
 
         scheduler.buildTask(authentic, () -> {
-            if (autoLogin && account.get().licensed()) {
+            if (/*autoLogin && */account.get().licensed() || player.isOnlineMode()) {
                 var message = messages.message(MessageKeys.LOGIN_FROM_LICENSE_MESSAGE);
                 player.sendMessage(message);
 
@@ -195,9 +195,7 @@ public class PluginListeners {
             var account = cached.get();
 
             if (autoLogin) {
-                var haveLicense = account.licensed();
-
-                if (haveLicense) {
+                if (account.licensed()) {
                     return;
                 }
 
@@ -216,7 +214,7 @@ public class PluginListeners {
     @Subscribe(order = PostOrder.LAST)
     public void onLimboPostLogin(LoginLimboRegisterEvent event) {
         var cached = accountManager.accountByName(event.getPlayer().getUsername());
-        var autoLogin = configuration.mainConfiguration().licensedAutologin();
+        var mainConfig = configuration.mainConfiguration();
 
         if (cached.isPresent()) {
             var account = cached.get();
@@ -227,10 +225,13 @@ public class PluginListeners {
             account.updateLastConnectedDate(connectionDate);
             account.updateLastConnectedAddress(connectionAddress);
 
-            if (autoLogin) {
-                if (account.licensed()) {
-                    return;
-                }
+            var autoLogin = mainConfig.licensedAutologin();
+            var licensed = account.licensed();
+
+            System.out.println(licensed);
+
+            if (licensed) {
+                return;
             }
 
             if (!account.registered() || !account.logged()) {

@@ -123,14 +123,6 @@ public class PluginLimboHandler implements LimboSessionHandler {
         var messagesConfig = configuration.messagesConfiguration();
         var mainConfig = configuration.mainConfiguration();
 
-        var unsafePasswords = authentic.unsafePasswords();
-        var checkPasswordStrength = configuration.securityConfiguration().checkPasswordStrength();
-
-        if (checkPasswordStrength && unsafePasswords.contains(chat.split(" ")[0])) {
-            var message = messages.message(MessageKeys.UNSAFE_PASSWORD);
-            player.sendMessage(message);
-        }
-
         if (!account.registered()) {
             var securityConfig = configuration.securityConfiguration();
 
@@ -169,6 +161,15 @@ public class PluginLimboHandler implements LimboSessionHandler {
                     }
                 }
             }
+
+            var unsafePasswords = authentic.unsafePasswords();
+            var checkPasswordStrength = configuration.securityConfiguration().checkPasswordStrength();
+
+            if (checkPasswordStrength && unsafePasswords.contains(chat.split(" ")[0])) {
+                var message = messages.message(MessageKeys.UNSAFE_PASSWORD);
+                player.sendMessage(message);
+            }
+
             authentic.defaultLogger().info("Handling account register for " + account.playerName() + "...");
             var hashedPassword = authentic.passwordEncryptor().encode(chat.split(" ")[0]);
 

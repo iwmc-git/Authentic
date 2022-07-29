@@ -34,10 +34,6 @@ public class PluginConfiguration implements AuthenticConfiguration {
     @Setting("messages-settings")
     protected MessagesConfiguration messagesConfiguration = new MessagesConfiguration();
 
-    @NodeKey
-    @Setting("commands-settings")
-    protected CommandsConfiguration commandsConfiguration = new CommandsConfiguration();
-
     @Override
     public MainConfiguration mainConfiguration() {
         return mainConfiguration;
@@ -66,10 +62,5 @@ public class PluginConfiguration implements AuthenticConfiguration {
     @Override
     public MessagesConfiguration messagesConfiguration() {
         return messagesConfiguration;
-    }
-
-    @Override
-    public CommandsConfiguration commandsConfiguration() {
-        return commandsConfiguration;
     }
 }

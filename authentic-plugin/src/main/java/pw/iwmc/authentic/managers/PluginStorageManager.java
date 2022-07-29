@@ -15,6 +15,7 @@ import pw.iwmc.authentic.api.managers.AuthenticStorageManager;
 import java.net.InetAddress;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class PluginStorageManager implements AuthenticStorageManager {
     private final VelocityAuthentic authentic = VelocityAuthentic.authentic();
@@ -46,6 +47,7 @@ public class PluginStorageManager implements AuthenticStorageManager {
 
         makeTable();
         mapInCache();
+        reconnect();
     }
 
     public void close() {
@@ -228,6 +230,15 @@ public class PluginStorageManager implements AuthenticStorageManager {
     }
 
     // =================== Private methods =================== //
+
+    private void reconnect() {
+        var scheduler = authentic.proxyServer().getScheduler();
+
+        scheduler.buildTask(authentic, () -> connection.execute("SELECT 1").execute())
+                .delay(20, TimeUnit.SECONDS)
+                .repeat(20, TimeUnit.SECONDS)
+                .schedule();
+    }
 
     private void makeTable() {
         authentic.defaultLogger().info("Creating new table...");

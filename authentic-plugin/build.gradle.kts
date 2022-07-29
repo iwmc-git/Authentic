@@ -9,7 +9,7 @@ dependencies {
 
     compileOnly("com.velocitypowered:velocity-api:3.1.2-SNAPSHOT")
 
-    compileOnly("pw.iwmc.libman:libman-api:1.0.6")
+    compileOnly("pw.iwmc.libman:libman-api:1.0.7")
 
     compileOnly("pw.iwmc.noelle:standalone-configuration-common:0.3.3-SNAPSHOT")
     compileOnly("pw.iwmc.noelle:standalone-configuration-hocon:0.3.3-SNAPSHOT")
@@ -27,6 +27,9 @@ dependencies {
     // other
     compileOnly("org.geysermc.floodgate:api:2.1.1-SNAPSHOT")
     compileOnly("net.elytrium:limboapi-api:1.0.6-SNAPSHOT")
+
+    compileOnly("dev.rollczi.litecommands:velocity:2.4.1")
+    compileOnly("dev.rollczi.litecommands:core:2.4.1")
 }
 
 tasks {

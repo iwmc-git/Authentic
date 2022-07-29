@@ -22,16 +22,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pw.iwmc.authentic.api.Authentic;
-import pw.iwmc.authentic.commands.LicenseCommand;
 import pw.iwmc.authentic.configuration.PluginConfiguration;
 import pw.iwmc.authentic.floodgate.FloodgateHolder;
 import pw.iwmc.authentic.limbo.PluginLimbo;
 import pw.iwmc.authentic.managers.PluginAccountManager;
+import pw.iwmc.authentic.commands.manager.PluginCommandsManager;
 import pw.iwmc.authentic.managers.PluginLicenseManager;
 import pw.iwmc.authentic.managers.PluginStorageManager;
 import pw.iwmc.authentic.messages.MessageKeys;
 
 import pw.iwmc.libman.api.LibmanAPI;
+import pw.iwmc.libman.api.objects.Dependency;
+import pw.iwmc.libman.api.objects.Repository;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,6 +55,7 @@ public class VelocityAuthentic implements Authentic {
     private PluginAccountManager accountManager;
     private PluginLicenseManager licenseManager;
     private PluginStorageManager storageManager;
+    private PluginCommandsManager commandsManager;
 
     private AbstractMessages<Player> messages;
     private PasswordEncryptor passwordEncryptor;
@@ -89,7 +92,7 @@ public class VelocityAuthentic implements Authentic {
             this.floodgateHolder = new FloodgateHolder();
         }
 
-        registerCommands();
+        this.commandsManager = new PluginCommandsManager();
 
         var eventManager = proxyServer.getEventManager();
         eventManager.register(this, new PluginListeners());
@@ -104,6 +107,7 @@ public class VelocityAuthentic implements Authentic {
         defaultLogger.info("Updating " + cachedAccounts.size() + " in database...");
         cachedAccounts.forEach((key, value) -> storageManager.updateAccount(value));
 
+        commandsManager.unregisterAll();
         storageManager.close();
     }
 
@@ -155,12 +159,6 @@ public class VelocityAuthentic implements Authentic {
         return PasswordEncryptor.encryptionType(algorithm);
     }
 
-    private void registerCommands() {
-        var commandManager = proxyServer.getCommandManager();
-
-        commandManager.register("license", new LicenseCommand(), "premium");
-    }
-
     private List<String> applyUnsafePasswords() {
         try {
             var resource = getClass().getClassLoader().getResourceAsStream("pw/iwmc/authentic/files/unsafe-passwords.txt");
@@ -183,11 +181,27 @@ public class VelocityAuthentic implements Authentic {
     }
 
     private void injectDependencies() {
-        var libman = LibmanAPI.libman();
-        var downloaded = libman.downloaded();
+        try {
+            var libman = LibmanAPI.libman();
+            var downloaded = libman.downloaded();
 
-        defaultLogger.info("Injecting " + downloaded.size() + " dependencies...");
-        downloaded.forEach((key, value) -> proxyServer.getPluginManager().addToClasspath(this, value));
+            var liteCommandsCore = Dependency.of("dev.rollczi.litecommands:core:2.4.1");
+            var liteCommandsVelocity = Dependency.of("dev.rollczi.litecommands:velocity:2.4.1");
+            var expressible = Dependency.of("org.panda-lang:expressible:1.1.20");
+
+            var pandaRepo = Repository.of("panda-repo", "https://repo.panda-lang.org/releases/");
+
+            defaultLogger.info("Download plugin dependencies...");
+            var downloader = libman.downloader();
+            downloader.downloadDependencyFromRepo(liteCommandsVelocity, pandaRepo);
+            downloader.downloadDependencyFromRepo(liteCommandsCore, pandaRepo);
+            downloader.downloadDependencyFromRepo(expressible, pandaRepo);
+
+            defaultLogger.info("Injecting " + downloaded.size() + " dependencies...");
+            downloaded.forEach((key, value) -> proxyServer.getPluginManager().addToClasspath(this, value));
+        } catch (Exception exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     private void loadMessages() {
