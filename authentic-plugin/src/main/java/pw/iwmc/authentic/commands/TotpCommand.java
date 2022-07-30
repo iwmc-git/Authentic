@@ -52,6 +52,11 @@ public class TotpCommand {
                     return;
                 }
 
+                if (account.licensed()) {
+                    messages.sendMessage(player, MessageKeys.TOTP_ACCOUNT_LICENSED);
+                    return;
+                }
+
                 var message = messages.message(MessageKeys.TOTP_COMMON_USAGE);
                 player.sendMessage(message);
             });
@@ -72,6 +77,11 @@ public class TotpCommand {
                 if (!totpEnabled) {
                     var message = messages.message(MessageKeys.TOTP_FORCE_DISABLED);
                     player.sendMessage(message);
+                    return;
+                }
+
+                if (account.licensed()) {
+                    messages.sendMessage(player, MessageKeys.TOTP_ACCOUNT_LICENSED);
                     return;
                 }
 
@@ -135,6 +145,11 @@ public class TotpCommand {
                 if (!totpEnabled) {
                     var message = messages.message(MessageKeys.TOTP_FORCE_DISABLED);
                     player.sendMessage(message);
+                    return;
+                }
+
+                if (account.licensed()) {
+                    messages.sendMessage(player, MessageKeys.TOTP_ACCOUNT_LICENSED);
                     return;
                 }
 

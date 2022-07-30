@@ -76,6 +76,8 @@ messages:
         totp-pass-subtitle: "<gray>Enter your TOTP code!</gray>"
 
     totp-in-game:
+        account-licensed: "%prefix% <gray>You have a licensed account, you do not need it!</gray>"
+    
         totp-common-usage: |-
             <gray>
             %prefix% <gray>Enable TOTP <dark_gray>- <green>/totp enable [password]</green>

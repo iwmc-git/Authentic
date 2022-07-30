@@ -16,6 +16,8 @@ public class MessageKeys {
     public final static MessageKey PASSWORD_TOO_SHORT = MessageKey.of("messages.password-too-short");
 
     public final static MessageKey TOTP_FORCE_DISABLED = MessageKey.of("messages.totp-in-game.totp-force-disabled");
+    public final static MessageKey TOTP_ACCOUNT_LICENSED = MessageKey.of("messages.totp-in-game.account-licensed");
+
     public final static MessageKey TOTP_COMMON_USAGE = MessageKey.of("messages.totp-in-game.totp-common-usage");
     public final static MessageKey TOTP_ALREADY_ENABLED = MessageKey.of("messages.totp-in-game.totp-already-enabled");
     public final static MessageKey TOTP_DISABLE_USAGE = MessageKey.of("messages.totp-in-game.totp-disable-usage");
