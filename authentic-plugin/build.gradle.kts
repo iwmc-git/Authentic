@@ -25,7 +25,7 @@ dependencies {
     compileOnly("pw.iwmc.noelle:common-messages:0.3.3-SNAPSHOT")
 
     // other
-    compileOnly("org.geysermc.floodgate:api:2.1.1-SNAPSHOT")
+    compileOnly("org.geysermc.floodgate:api:2.2.0-SNAPSHOT")
     compileOnly("net.elytrium:limboapi-api:1.0.6-SNAPSHOT")
     compileOnly("dev.samstevens.totp:totp:1.7.1")
 
