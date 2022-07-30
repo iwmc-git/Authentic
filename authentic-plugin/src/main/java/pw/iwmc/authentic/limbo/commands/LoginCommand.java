@@ -46,10 +46,9 @@ public class LoginCommand {
             return;
         }
 
-        var hashedPassword = authentic.passwordEncryptor().encode(arguments[1]);
         var currentPassword = account.hashedPassword();
 
-        if (currentPassword.isPresent() && currentPassword.get().equalsIgnoreCase(hashedPassword)) {
+        if (currentPassword.isPresent() && authentic.passwordEncryptor().matches(arguments[1], currentPassword.get())) {
             authentic.debug("Handling account login for " + account.playerName() + "...");
 
             var postLoginTasks = authentic.accountManager().postLoginTasks();
