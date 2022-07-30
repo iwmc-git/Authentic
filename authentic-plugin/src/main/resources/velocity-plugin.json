@@ -19,5 +19,6 @@
       "optional": true
     }
   ],
+
   "main": "pw.iwmc.authentic.VelocityAuthentic"
 }
