@@ -16,6 +16,11 @@ public interface AuthenticMessagesConfig {
     boolean titlesEnabled();
     boolean hoversEnabled();
 
+    long afterRegisterDelay();
+    long afterLoginDelay();
+    long afterLicenseLoginDelay();
+    long afterSessionLoginDelay();
+
     AuthenticTitleValues requiredLoginTitleSettings();
     AuthenticTitleValues requiredRegisterTitleSettings();
 
@@ -23,5 +28,7 @@ public interface AuthenticMessagesConfig {
     AuthenticTitleValues registeredTitleSettings();
 
     AuthenticTitleValues licenseLoggedTitleSettings();
+    AuthenticTitleValues loggedFromSessionTitleSettings();
+
     AuthenticTitleValues totpTitleSettings();
 }

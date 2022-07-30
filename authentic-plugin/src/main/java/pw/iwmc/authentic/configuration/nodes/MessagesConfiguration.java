@@ -8,6 +8,7 @@ import pw.iwmc.authentic.api.configuration.enums.BossbarColor;
 import pw.iwmc.authentic.api.configuration.enums.BossbarOverlay;
 import pw.iwmc.authentic.api.configuration.nodes.AuthenticMessagesConfig;
 
+import pw.iwmc.authentic.api.configuration.nodes.value.AuthenticTitleValues;
 import pw.iwmc.authentic.configuration.nodes.value.PluginTitleValues;
 
 @ConfigSerializable
@@ -31,6 +32,18 @@ public class MessagesConfiguration implements AuthenticMessagesConfig {
     @Setting("hovers-enabled")
     protected boolean hoversEnabled = false;
 
+    @Setting("after-register-delay")
+    protected long afterRegisterDelay = 1700;
+
+    @Setting("after-login-delay")
+    protected long afterLoginDelay = 1700;
+
+    @Setting("after-license-login-delay")
+    protected long afterLicenseLoginDelay = 1700;
+
+    @Setting("after-session-login-delay")
+    protected long afterSessionLoginDelay = 1700;
+
     @NodeKey
     @Setting("required-login-title-settings")
     protected PluginTitleValues requiredLoginTitleSettings = new PluginTitleValues();
@@ -50,6 +63,10 @@ public class MessagesConfiguration implements AuthenticMessagesConfig {
     @NodeKey
     @Setting("license-logged-title-settings")
     protected PluginTitleValues licenseLoggedTitleSettings = new PluginTitleValues();
+
+    @NodeKey
+    @Setting("logged-from-session-title-settings")
+    protected PluginTitleValues sessionLoggedTitleSettings = new PluginTitleValues();
 
     @NodeKey
     @Setting("totp-title-settings")
@@ -86,6 +103,26 @@ public class MessagesConfiguration implements AuthenticMessagesConfig {
     }
 
     @Override
+    public long afterRegisterDelay() {
+        return afterRegisterDelay;
+    }
+
+    @Override
+    public long afterLoginDelay() {
+        return afterLoginDelay;
+    }
+
+    @Override
+    public long afterLicenseLoginDelay() {
+        return afterLicenseLoginDelay;
+    }
+
+    @Override
+    public long afterSessionLoginDelay() {
+        return afterSessionLoginDelay;
+    }
+
+    @Override
     public PluginTitleValues requiredLoginTitleSettings() {
         return requiredLoginTitleSettings;
     }
@@ -108,6 +145,11 @@ public class MessagesConfiguration implements AuthenticMessagesConfig {
     @Override
     public PluginTitleValues licenseLoggedTitleSettings() {
         return licenseLoggedTitleSettings;
+    }
+
+    @Override
+    public PluginTitleValues loggedFromSessionTitleSettings() {
+        return sessionLoggedTitleSettings;
     }
 
     @Override

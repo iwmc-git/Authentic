@@ -118,7 +118,7 @@ public class PluginListeners {
             scheduler.buildTask(authentic, () -> {
                 registerRunnable.run();
                 postRegisterTasks.remove(player.getUsername());
-            }).delay(30, TimeUnit.MILLISECONDS).schedule();
+            }).delay(messagesConfig.afterRegisterDelay(), TimeUnit.MILLISECONDS).schedule();
             return;
         }
 
@@ -127,12 +127,12 @@ public class PluginListeners {
             scheduler.buildTask(authentic, () -> {
                 loginRunnable.run();
                 postLoginTasks.remove(player.getUsername());
-            }).delay(30, TimeUnit.MILLISECONDS).schedule();
+            }).delay(messagesConfig.afterLoginDelay(), TimeUnit.MILLISECONDS).schedule();
             return;
         }
 
-        scheduler.buildTask(authentic, () -> {
-            if (/*autoLogin && */account.get().licensed() || player.isOnlineMode()) {
+        if (/*autoLogin && */account.get().licensed() || player.isOnlineMode()) {
+            scheduler.buildTask(authentic, () -> {
                 var message = messages.message(MessageKeys.LOGIN_FROM_LICENSE_MESSAGE);
                 player.sendMessage(message);
 
@@ -151,7 +151,9 @@ public class PluginListeners {
 
                     player.showTitle(title);
                 }
-            } else {
+            }).delay(messagesConfig.afterLicenseLoginDelay(), TimeUnit.MILLISECONDS).schedule();
+        } else {
+            scheduler.buildTask(authentic, () -> {
                 var message = messages.message(MessageKeys.LOGIN_FROM_SESSION_MESSAGE);
                 player.sendMessage(message);
 
@@ -170,8 +172,8 @@ public class PluginListeners {
 
                     player.showTitle(title);
                 }
-            }
-        }).delay(30, TimeUnit.MILLISECONDS).schedule();
+            }).delay(messagesConfig.afterSessionLoginDelay(), TimeUnit.MILLISECONDS).schedule();
+        }
 
         authentic.debug("Event `onPostLogin` executed for " + event.getPlayer().getUsername());
     }
