@@ -1,11 +1,9 @@
 plugins {
     id("java-library")
-    id("maven-publish")
 }
 
 allprojects {
     apply(plugin = "java-library")
-    apply(plugin = "maven-publish")
 
     group = "pw.iwmc.authentic"
     version = "0.0.1-SNAPSHOT"
@@ -29,25 +27,5 @@ allprojects {
         maven { url = uri("https://maven.elytrium.net/repo/") }
         maven { url = uri("https://maven.iwmc.pw/snapshots/") }
         maven { url = uri("https://maven.iwmc.pw/releases/") }
-    }
-
-    publishing {
-        repositories {
-            maven {
-                name = "icewynd-repository"
-
-                val releases = "https://maven.iwmc.pw/releases/"
-                val snapshots = "https://maven.iwmc.pw/snapshots/"
-
-                val finalUrl = if (rootProject.version.toString().endsWith("SNAPSHOT")) snapshots else releases
-
-                url = uri(finalUrl)
-
-                credentials {
-                    username = System.getenv("REPO_USERNAME")
-                    password = System.getenv("REPO_TOKEN")
-                }
-            }
-        }
     }
 }
