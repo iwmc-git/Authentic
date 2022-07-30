@@ -1,7 +1,3 @@
-plugins {
-    id("maven-publish") apply(true)
-}
-
 version = "1.0-SNAPSHOT"
 
 dependencies {

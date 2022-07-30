@@ -1,9 +1,11 @@
 plugins {
     id("java-library")
+    id("maven-publish")
 }
 
 allprojects {
     apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
 
     group = "pw.iwmc.authentic"
     version = "0.0.1-SNAPSHOT"
