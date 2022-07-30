@@ -42,11 +42,9 @@ public class UnregisterCommand {
                 }
 
                 var password = args[0];
-
-                var hashedOld = encryptor.encode(password);
                 var currentPassword = account.hashedPassword().get();
 
-                if (!currentPassword.equals(hashedOld)) {
+                if (!encryptor.matches(password, currentPassword)) {
                     var message = messages.message(MessageKeys.UNREGISTER_WRONG_PASSWORD);
                     player.sendMessage(message);
                     return;
