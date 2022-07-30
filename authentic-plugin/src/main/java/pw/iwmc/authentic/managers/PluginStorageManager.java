@@ -145,7 +145,7 @@ public class PluginStorageManager implements AuthenticStorageManager {
             preparedStatement.setString(2, account.playerName());
 
             try {
-                var totpToken = account.hashedPassword();
+                var totpToken = account.totpToken();
                 if (totpToken != null && totpToken.isPresent()) {
                     preparedStatement.setString(3, totpToken.get());
                 } else {

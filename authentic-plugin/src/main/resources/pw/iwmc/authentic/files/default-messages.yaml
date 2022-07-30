@@ -1,7 +1,7 @@
 messages:
     prefix: "<color:#12ffa0><b>❖</color> <dark_gray><b>•</dark_gray>"
     only-for-players: "<red>Only for players!</red>"
-    invalid-command: "Invalid command!"
+    invalid-command: "%prefix% <gray>Invalid command!"
     
     invalid-name: |-
         <gray>Your nickname contains <red>incorrect <gray>characters or the <red>wrong <gray>length.</gray>
@@ -129,13 +129,13 @@ messages:
         bossbar-login-remaining-message: "<gray>You have <blue>%time% <gray>seconds left to login!</gray>"
         bossbar-register-remaining-message: "<gray>You have <blue>%time% <gray>seconds left to register!</gray>"
         
-        login-required-message: "%prefix% <gray>Please enter your password in chat!</gray>"
+        login-required-message: "%prefix% <gray>Please login <dark_gray>- <green>/login [password]</gray>"
         login-required-title: "<b><green>AUTHENTIC</green></b>"
-        login-required-subtitle: "<gray>Enter your password in chat!</gray>"
+        login-required-subtitle: "<gray>Please login <dark_gray>- <green>/login [password]!</gray>"
         
-        register-required-message: "%prefix% <gray>Please enter your password in chat!</gray>"
+        register-required-message: "%prefix% <gray>Please register <dark_gray>- <green>/register [password]</gray>"
         register-required-title: "<b><green>AUTHENTIC</green></b>"
-        register-required-subtitle: "<gray>Enter your password in chat!</gray>"
+        register-required-subtitle: "<gray>Please register <dark_gray>- <green>/register [password]</gray>"
         
     success:
         login-from-session-message: "%prefix% <gray>You have successfully logged from session!</gray>"

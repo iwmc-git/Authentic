@@ -118,7 +118,7 @@ public class PluginListeners {
             scheduler.buildTask(authentic, () -> {
                 registerRunnable.run();
                 postRegisterTasks.remove(player.getUsername());
-            }).delay(1, TimeUnit.SECONDS).schedule();
+            }).delay(30, TimeUnit.MILLISECONDS).schedule();
             return;
         }
 
@@ -127,7 +127,7 @@ public class PluginListeners {
             scheduler.buildTask(authentic, () -> {
                 loginRunnable.run();
                 postLoginTasks.remove(player.getUsername());
-            }).delay(1, TimeUnit.SECONDS).schedule();
+            }).delay(30, TimeUnit.MILLISECONDS).schedule();
             return;
         }
 
@@ -171,7 +171,7 @@ public class PluginListeners {
                     player.showTitle(title);
                 }
             }
-        }).delay(2, TimeUnit.SECONDS).schedule();
+        }).delay(30, TimeUnit.MILLISECONDS).schedule();
 
         authentic.debug("Event `onPostLogin` executed for " + event.getPlayer().getUsername());
     }

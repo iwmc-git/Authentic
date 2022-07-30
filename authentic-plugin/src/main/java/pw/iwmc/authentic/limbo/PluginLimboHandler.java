@@ -120,19 +120,17 @@ public class PluginLimboHandler implements LimboSessionHandler {
     public void onChat(String chat) {
         var chatArgs = chat.split(" ");
 
-        if (chatArgs.length == 0) {
-            return;
-        }
+        if (chatArgs.length != 0) {
+            if (!chatArgs[0].startsWith("/")) {
+                return;
+            }
 
-        if (chatArgs[0].contains("/")) {
-            return;
-        }
-
-        switch (LimboCommand.parseCommand(chatArgs[0])) {
-            case LOGIN -> limboCommands.loginCommand().execute(player, chatArgs);
-            case REGISTER -> limboCommands.registerCommand().execute(player, chatArgs);
-            case TOTP -> limboCommands.totpCommand().execute(player, chatArgs);
-            case INVALID -> messages.sendMessage(player, MessageKeys.INVALID_COMMAND);
+            switch (LimboCommand.parseCommand(chatArgs[0])) {
+                case LOGIN -> limboCommands.loginCommand().execute(player, chatArgs);
+                case REGISTER -> limboCommands.registerCommand().execute(player, chatArgs);
+                case TOTP -> limboCommands.totpCommand().execute(player, chatArgs);
+                case INVALID -> messages.sendMessage(player, MessageKeys.INVALID_COMMAND);
+            }
         }
     }
 
@@ -157,6 +155,11 @@ public class PluginLimboHandler implements LimboSessionHandler {
         return () -> {
             var accountConnectionTime = account.lastConnectedDate().getTime() + authTime;
             var remainAuthTime = (accountConnectionTime - System.currentTimeMillis()) / 1000;
+
+            if (remainAuthTime <= 0L) {
+                var message = messages.message(MessageKeys.TIME_OUT);
+                player.disconnect(message);
+            }
 
             if (!account.registered()) {
                 var message = messages.message(MessageKeys.REGISTER_REQUIRED_MESSAGE);
@@ -194,11 +197,6 @@ public class PluginLimboHandler implements LimboSessionHandler {
                         player.sendMessage(message);
                     }
                 }
-            }
-
-            if (remainAuthTime <= 0) {
-                var message = messages.message(MessageKeys.TIME_OUT);
-                player.disconnect(message);
             }
         };
     }
