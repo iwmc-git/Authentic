@@ -16,6 +16,10 @@ allprojects {
         }
     }
 
+    java {
+        withSourcesJar()
+    }
+
     repositories {
         mavenCentral()
 
