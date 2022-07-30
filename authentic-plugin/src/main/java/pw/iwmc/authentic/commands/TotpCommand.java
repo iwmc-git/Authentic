@@ -98,9 +98,8 @@ public class TotpCommand {
                 }
 
                 var password = account.hashedPassword();
-                var hashedPassword = encryptor.encode(args[1]);
 
-                if (!password.get().equals(hashedPassword)) {
+                if (encryptor.matches(args[1], password.get())) {
                     var message = messages.message(MessageKeys.TOTP_WRONG_PASSWORD);
                     player.sendMessage(message);
                     return;
