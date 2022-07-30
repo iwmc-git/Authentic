@@ -15,7 +15,7 @@ dependencies {
     compileOnly("pw.iwmc.noelle:standalone-configuration-hocon:0.3.3-SNAPSHOT")
     compileOnly("pw.iwmc.noelle:standalone-configuration-yaml:0.3.3-SNAPSHOT")
 
-    compileOnly("pw.iwmc.noelle:standalone-database-common:0.3.3-SNAPSHOT")
+    compileOnly("pw.iwmc.noelle:standalone-database-common:1.0.1")
     compileOnly("pw.iwmc.noelle:standalone-database-mariadb:0.3.3-SNAPSHOT")
     compileOnly("pw.iwmc.noelle:standalone-database-h2:0.3.3-SNAPSHOT")
 
