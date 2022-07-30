@@ -48,10 +48,9 @@ public class ChangePasswordCommand {
                 var oldPassword = args[0];
                 var newPassword = args[1];
 
-                var hashedOld = encryptor.encode(oldPassword);
                 var currentPassword = account.hashedPassword().get();
 
-                if (!currentPassword.equals(hashedOld)) {
+                if (!encryptor.matches(oldPassword, currentPassword)) {
                     var message = messages.message(MessageKeys.CHANGEPASSWORD_WRONG_OLD_PASSWORD);
                     player.sendMessage(message);
                     return;
