@@ -20,7 +20,7 @@ public class MainConfiguration implements AuthenticMainConfig {
     @Setting("licensed-autologin")
     protected boolean licensedAutologin = true;
 
-    @Setting("ldebug")
+    @Setting("debug")
     protected boolean debug = false;
 
     @Override
