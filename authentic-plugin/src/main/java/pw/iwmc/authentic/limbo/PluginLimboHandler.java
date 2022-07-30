@@ -40,7 +40,7 @@ public class PluginLimboHandler implements LimboSessionHandler {
     private ScheduledTask authTask;
 
     public PluginLimboHandler(AuthenticAccount account, Player player) {
-        authentic.defaultLogger().info("Creating limbo handler for " + player.getUsername() + "...");
+        authentic.debug("Creating limbo handler for " + player.getUsername() + "...");
 
         this.account = account;
         this.player = player;
@@ -136,7 +136,7 @@ public class PluginLimboHandler implements LimboSessionHandler {
 
     @Override
     public void onDisconnect() {
-        authentic.defaultLogger().info("Player " + player.getUsername() + " disconnected from limbo! Stooping tasks, hiding boss bar...");
+        authentic.debug("Player " + player.getUsername() + " disconnected from limbo! Stooping tasks, hiding boss bar...");
 
         var limboPlayers = accountManager.limboPlayers();
         limboPlayers.remove(player.getUsername());

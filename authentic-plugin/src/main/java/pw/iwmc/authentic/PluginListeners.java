@@ -228,7 +228,7 @@ public class PluginListeners {
             }
         }
 
-        authentic.defaultLogger().info("Event `onLimboLogin` executed for " + event.getPlayer().getUsername());
+        authentic.debug("Event `onLimboLogin` executed for " + event.getPlayer().getUsername());
     }
 
     // ?
