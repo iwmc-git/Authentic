@@ -19,7 +19,7 @@ dependencies {
     compileOnly("pw.iwmc.noelle:standalone-database-mariadb:0.3.3-SNAPSHOT")
     compileOnly("pw.iwmc.noelle:standalone-database-h2:0.3.3-SNAPSHOT")
 
-    compileOnly("pw.iwmc.noelle:standalone-encryptor:0.3.3-SNAPSHOT")
+    compileOnly("pw.iwmc.noelle:standalone-encryptor:1.0.1")
 
     compileOnly("pw.iwmc.noelle:velocity-messages:0.3.3-SNAPSHOT")
     compileOnly("pw.iwmc.noelle:common-messages:0.3.3-SNAPSHOT")
